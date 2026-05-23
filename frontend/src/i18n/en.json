@@ -1,0 +1,95 @@
+{
+  "nav": {
+    "home": "Home",
+    "designer": "Designer",
+    "myDesigns": "My Designs",
+    "signIn": "Sign In",
+    "signOut": "Sign Out"
+  },
+  "hero": {
+    "badge": "AI-Powered Home Design",
+    "title": "Design Your Dream",
+    "titleHighlight": "Indian Home",
+    "subtitle": "Tell Agni AI about your vision. Get a 3D floor plan in seconds — with Vastu scoring, budget planning, and a voice assistant that speaks your language.",
+    "cta": "Start Designing",
+    "ctaSecondary": "View Templates",
+    "feature1": "AI 3D Floor Plans",
+    "feature2": "Vastu Scoring",
+    "feature3": "Voice Assistant",
+    "feature4": "4 Languages"
+  },
+  "wizard": {
+    "title": "Let's design your home",
+    "subtitle": "Answer a few questions to get your personalized floor plan",
+    "step": "Step {{current}} of {{total}}",
+    "next": "Next",
+    "back": "Back",
+    "generate": "Generate My Floor Plan",
+    "questions": {
+      "homeType": "What type of home are you planning?",
+      "budget": "What's your budget?",
+      "vastu": "Do you want Vastu compliance?",
+      "rooms": "Which rooms do you need?",
+      "kitchenStyle": "What kitchen style do you prefer?",
+      "style": "Preferred interior style?",
+      "colorPalette": "What color palette do you prefer?",
+      "facing": "Main facing direction?",
+      "flooring": "What flooring do you prefer?",
+      "specialRequirements": "Any special requirements?"
+    },
+    "options": {
+      "homeType": ["1BHK", "2BHK", "3BHK", "Villa", "Studio"],
+      "budget": ["Under ₹5L", "₹5L–₹15L", "₹15L–₹30L", "₹30L+"],
+      "vastu": ["Yes, strictly", "Preferred", "No"],
+      "rooms": ["Pooja Room", "Open Kitchen", "Study Room", "Servant Room", "Balcony", "Home Office", "Home Gym", "Guest Room"],
+      "kitchenStyle": ["Open Kitchen", "Closed Kitchen", "L-Shaped", "Parallel / Galley", "Island Kitchen"],
+      "style": ["Modern", "Traditional Indian", "Minimalist", "Royal/Heritage"],
+      "colorPalette": ["Warm (beige, terracotta)", "Cool (white, grey)", "Bold & Vibrant", "Earthy & Natural", "Soft Pastel"],
+      "facing": ["East", "West", "North", "South", "Don't know"],
+      "flooring": ["Marble", "Vitrified Tiles", "Wooden Laminate", "Granite", "No preference"],
+      "specialRequirements": ["Wheelchair accessible", "Senior-friendly", "Pet-friendly", "Work-from-home setup", "None of the above"]
+    }
+  },
+  "viewer": {
+    "title": "Your Floor Plan",
+    "rotate": "Rotate",
+    "zoom": "Zoom",
+    "reset": "Reset View",
+    "toggleAR": "View in AR",
+    "rooms": "Rooms",
+    "area": "Total Area",
+    "sqft": "sq ft"
+  },
+  "vastu": {
+    "title": "Vastu Score",
+    "score": "Score",
+    "suggestions": "Suggestions",
+    "good": "Good",
+    "warning": "Needs Attention",
+    "bad": "Conflict"
+  },
+  "budget": {
+    "title": "Budget Breakdown",
+    "construction": "Construction",
+    "interiors": "Interiors",
+    "furniture": "Furniture",
+    "shopAt": "Shop at",
+    "viewItem": "View Item"
+  },
+  "voicebot": {
+    "title": "Agni Assistant",
+    "placeholder": "Ask me anything about your home...",
+    "speaking": "Listening...",
+    "thinking": "Agni is thinking...",
+    "tapToSpeak": "Tap to speak",
+    "send": "Send"
+  },
+  "common": {
+    "loading": "Loading...",
+    "error": "Something went wrong",
+    "retry": "Try Again",
+    "save": "Save Design",
+    "share": "Share",
+    "download": "Download"
+  }
+}

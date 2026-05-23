@@ -1,0 +1,29 @@
+{
+  "name": "frontend",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview"
+  },
+  "devDependencies": {
+    "typescript": "~6.0.2",
+    "vite": "^8.0.12"
+  },
+  "dependencies": {
+    "@react-three/drei": "^10.7.7",
+    "@react-three/fiber": "^9.6.1",
+    "@react-three/xr": "^6.6.29",
+    "firebase": "^12.13.0",
+    "i18next": "^26.2.0",
+    "jspdf": "^4.2.1",
+    "react-i18next": "^17.0.8",
+    "react-router-dom": "^7.15.1",
+    "three": "^0.184.0"
+  },
+  "overrides": {
+    "three": "^0.184.0"
+  }
+}
