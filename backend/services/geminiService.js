@@ -471,7 +471,20 @@ Ensure all room boundaries are logical (e.g. Master Bedroom is at least 4x4, Poo
     return parsed;
   } catch (err) {
     console.error('Gemini Floor Plan Generation Error:', err.message);
-    return { ...MOCK_FLOOR_PLAN, description };
+    // Use the correct template for the requested homeType instead of always defaulting to 2BHK
+    const templates = require('../data/templates');
+    const homeType = preferences.homeType || '2BHK';
+    const fallbackTemplate = templates[homeType] || templates['2BHK'];
+    const fallbackRooms = JSON.parse(JSON.stringify(fallbackTemplate.rooms));
+    fallbackRooms.forEach(r => { r.floor = r.floor || 0; });
+    return {
+      title: fallbackTemplate.title,
+      totalArea: fallbackTemplate.totalArea,
+      style: preferences.style || fallbackTemplate.style,
+      vastuScore: fallbackTemplate.vastuScore,
+      rooms: resolveOverlaps(fallbackRooms),
+      description
+    };
   }
 }
 
@@ -517,13 +530,15 @@ You MUST return valid JSON matching this exact schema:
 
 async function chatWithAgni(message, language = 'en', conversationHistory = []) {
   const systemInstruction = `You are Agni, a warm, highly intelligent, and professional Indian home design assistant.
-Your absolute primary goal is to provide DIRECT, HIGHLY RELEVANT answers to the user's specific questions. 
+Your absolute primary goal is to provide DIRECT, HIGHLY RELEVANT answers to the user's specific questions.
 Rules:
-1. FOCUS ON THE QUESTION: If the user asks for a specific layout, Vastu tip, or design idea, answer it directly and practically. Do not give generic fluff.
-2. DOMAIN EXPERTISE: You specialize in Indian architectural space, Vastu compliance, home structures, and interior decor (use terms like BHK, Lakh, Crore naturally).
-3. OUT OF SCOPE: If the user asks a question completely unrelated to homes, architecture, design, or Vastu, politely decline and steer them back to home design.
-4. LANGUAGE: Always speak in the requested language: ${language}.
-5. CONCISE: Keep responses elegant, actionable, and concise (maximum 3-4 sentences) so it is perfect for speech synthesizer output.`;
+1. FOCUS ON THE QUESTION: If the user asks for a specific layout, Vastu tip, furniture suggestion, color scheme, room dimension, or design idea — answer it directly, practically, and with specific examples or numbers where helpful.
+2. DOMAIN EXPERTISE: You specialize in Indian architectural space, Vastu compliance, home structures, and interior decor. Use Indian terms naturally (BHK, Lakh, Crore, Vastu, Griha Pravesh, etc.).
+3. VASTU RULES: Know these by heart — Kitchen: South-East, Pooja Room: North-East, Master Bedroom: South-West, Main Door: East or North, Toilets: West or North-West.
+4. OUT OF SCOPE: If the user asks something completely unrelated to homes, architecture, design, or Vastu, politely decline in one sentence and redirect.
+5. LANGUAGE: Always respond in the requested language: ${language}.
+6. CONCISE: Keep responses elegant, actionable, and to the point (2-4 sentences max) so it is clear and works well for voice output.
+7. NEVER give generic or vague answers. Always be specific to what the user actually asked.`;
 
   const formattedHistory = conversationHistory
     .map(h => `${h.role === 'user' ? 'User' : 'Agni'}: ${h.content}`)

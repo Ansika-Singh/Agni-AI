@@ -91,17 +91,51 @@ export default function Designer() {
 
   const FALLBACK_LAYOUTS = {
     "1BHK": [
-      { id: "r1", name: "Living Room", width: 4.5, height: 4, x: 2.25, y: 2, color: "#ec4899", floor: 0 },
-      { id: "r2", name: "Kitchen", width: 2.5, height: 3, x: 5.75, y: 1.5, color: "#f97316", floor: 0 },
-      { id: "r3", name: "Bedroom", width: 3.5, height: 3.5, x: 2.25, y: 5.75, color: "#b19cd9", floor: 0 },
-      { id: "r4", name: "Bathroom", width: 2, height: 2, x: 5.75, y: 5, color: "#4ecdc4", floor: 0 }
+      { id: "r1", name: "Living Room", width: 4.5, height: 4, x: 0, y: 0, color: "#ec4899", floor: 0 },
+      { id: "r2", name: "Kitchen", width: 3, height: 3, x: 4.5, y: 0, color: "#f97316", floor: 0 },
+      { id: "r3", name: "Pooja Corner", width: 3, height: 1.5, x: 4.5, y: 3, color: "#ffd700", floor: 0 },
+      { id: "r4", name: "Bedroom", width: 4.5, height: 4, x: 0, y: 4, color: "#b19cd9", floor: 0 },
+      { id: "r5", name: "Bathroom", width: 3, height: 2.5, x: 4.5, y: 4.5, color: "#4ecdc4", floor: 0 }
     ],
     "2BHK": [
-      { id: "r1", name: "Living Room", width: 5, height: 4, x: 2.5, y: 2, color: "#ec4899", floor: 0 },
-      { id: "r2", name: "Kitchen", width: 3, height: 3, x: 6.5, y: 1.5, color: "#f97316", floor: 0 },
-      { id: "r3", name: "Master Bedroom", width: 4, height: 3.5, x: 2, y: 5.75, color: "#b19cd9", floor: 0 },
-      { id: "r4", name: "Bedroom 2", width: 3.5, height: 3.5, x: 6.25, y: 5.75, color: "#b19cd9", floor: 0 },
-      { id: "r5", name: "Bathroom", width: 2, height: 2, x: 4, y: 8, color: "#4ecdc4", floor: 0 }
+      { id: "r1", name: "Living Room", width: 5, height: 4.5, x: 0, y: 0, color: "#ffd700", floor: 0 },
+      { id: "r2", name: "Kitchen", width: 3, height: 3.5, x: 5, y: 0, color: "#f97316", floor: 0 },
+      { id: "r3", name: "Master Bedroom", width: 4, height: 4, x: 0, y: 4.5, color: "#b19cd9", floor: 0 },
+      { id: "r4", name: "Guest Bedroom", width: 3.5, height: 4, x: 4, y: 4.5, color: "#45b7d1", floor: 0 },
+      { id: "r5", name: "Bathroom", width: 1.8, height: 2.2, x: 7.5, y: 4.5, color: "#4ecdc4", floor: 0 },
+      { id: "r6", name: "Pooja Room", width: 1.5, height: 1.0, x: 5, y: 3.5, color: "#ffd700", floor: 0 },
+      { id: "r7", name: "Balcony", width: 5, height: 1.5, x: 0, y: 8.5, color: "#a8dadc", floor: 0 }
+    ],
+    "3BHK": [
+      { id: "r1", name: "Living Room", width: 6, height: 6, x: 0, y: 0, color: "#FF6B35", floor: 0 },
+      { id: "r2", name: "Dining Room", width: 4, height: 6, x: 6, y: 0, color: "#FFA07A", floor: 0 },
+      { id: "r3", name: "Kitchen", width: 4, height: 6, x: 10, y: 0, color: "#F7C59F", floor: 0 },
+      { id: "r4", name: "Master Bedroom", width: 5, height: 5, x: 0, y: 6, color: "#4ECDC4", floor: 0 },
+      { id: "r5", name: "Bedroom 2", width: 4, height: 5, x: 5, y: 6, color: "#45B7D1", floor: 0 },
+      { id: "r6", name: "Bedroom 3", width: 5, height: 5, x: 9, y: 6, color: "#7EC8E3", floor: 0 },
+      { id: "r7", name: "Pooja Room", width: 2.5, height: 3, x: 0, y: 11, color: "#FFD700", floor: 0 },
+      { id: "r8", name: "Study Room", width: 2.5, height: 3, x: 2.5, y: 11, color: "#DDA0DD", floor: 0 },
+      { id: "r9", name: "Master Bath", width: 3, height: 3, x: 5, y: 11, color: "#A8DADC", floor: 0 },
+      { id: "r10", name: "Bathroom 2", width: 3, height: 3, x: 8, y: 11, color: "#A8DADC", floor: 0 },
+      { id: "r11", name: "Main Balcony", width: 6, height: 2, x: 0, y: 14, color: "#95E1D3", floor: 0 }
+    ],
+    "Villa": [
+      { id: "r1", name: "Grand Living Room", width: 8, height: 6, x: 0, y: 0, color: "#FF6B35", floor: 0 },
+      { id: "r2", name: "Formal Dining", width: 6, height: 6, x: 8, y: 0, color: "#FFA07A", floor: 0 },
+      { id: "r3", name: "Master Suite", width: 6, height: 6, x: 0, y: 6, color: "#4ECDC4", floor: 0 },
+      { id: "r4", name: "Pooja Room", width: 2, height: 6, x: 6, y: 6, color: "#FFD700", floor: 0 },
+      { id: "r5", name: "Modular Kitchen", width: 6, height: 6, x: 8, y: 6, color: "#F7C59F", floor: 0 },
+      { id: "r6", name: "Family Lounge", width: 7, height: 5, x: 0, y: 12, color: "#DDA0DD", floor: 0 },
+      { id: "r7", name: "Home Gym", width: 7, height: 5, x: 7, y: 12, color: "#98FB98", floor: 0 },
+      { id: "r8", name: "Bedroom 2", width: 5, height: 5, x: 0, y: 17, color: "#45B7D1", floor: 0 },
+      { id: "r9", name: "Bedroom 3", width: 5, height: 5, x: 5, y: 17, color: "#7EC8E3", floor: 0 },
+      { id: "r10", name: "Master Bath", width: 4, height: 3, x: 10, y: 17, color: "#A8DADC", floor: 0 }
+    ],
+    "Studio": [
+      { id: "r1", name: "Studio Space", width: 6, height: 6, x: 0, y: 0, color: "#FF6B35", floor: 0 },
+      { id: "r2", name: "Kitchenette", width: 3, height: 3, x: 6, y: 0, color: "#F7C59F", floor: 0 },
+      { id: "r3", name: "Bathroom", width: 3, height: 3, x: 6, y: 3, color: "#A8DADC", floor: 0 },
+      { id: "r4", name: "Balcony", width: 6, height: 2, x: 0, y: 6, color: "#95E1D3", floor: 0 }
     ]
   };
 
@@ -288,25 +322,67 @@ export default function Designer() {
     const currentScore = vastuData?.score || floorPlan?.vastuScore || 78;
     const currentBudget = floorPlan?.budgetRange || '₹15L–₹30L';
 
+    if (query.includes('vastu') && (query.includes('score') || query.includes('rating'))) {
+      return `Your current Vastu score is ${currentScore}/100. ${currentScore >= 85 ? 'Excellent! Your layout follows Vastu principles very well.' : currentScore >= 70 ? 'Good score! Moving toilets to West/NW can boost it further.' : 'Moderate. Ensure kitchen is South-East and main entrance faces East or North.'} 🙏`;
+    }
+    if (query.includes('vastu') && query.includes('kitchen')) {
+      return 'Per Vastu, the kitchen must be in the South-East (Agni corner). North-West is an alternative. Avoid North-East or South-West as it causes health and financial issues. 🍳';
+    }
+    if (query.includes('vastu') && (query.includes('bedroom') || query.includes('master'))) {
+      return 'Master Bedroom in South-West is the strongest Vastu placement — the earth element zone for stability and deep sleep. Children rooms face East or North-West. 🛏';
+    }
     if (query.includes('vastu') || query.includes('score')) {
-      return `Your Vastu score is ${currentScore}/100. The kitchen is well-placed in the southeast. Consider moving the main entrance to face northeast for better energy flow. 🙏`;
+      return `Vastu score: ${currentScore}/100. Key placements — Kitchen: South-East 🔥, Pooja Room: North-East 🙏, Master Bedroom: South-West 🌍, Main Door: East/North ☀️, Toilets: West/North-West 💧.`;
     }
-    if (query.includes('kitchen') || query.includes('rasoi')) {
-      return "Your kitchen is placed in the southeast direction, which is ideal as per Vastu — that's the direction of Agni (fire)! The layout chosen suits your style perfectly. 🍳";
+    if (query.includes('kitchen') || query.includes('rasoi') || query.includes('cook')) {
+      return 'Your kitchen faces South-East — the ideal Vastu direction (Agni corner). For efficiency, choose an L-shaped counter or island layout. Modular kitchens from Livspace or HomeLane cost Rs1.5L-Rs4L for a 3x3m kitchen. 🍳';
     }
-    if (query.includes('bedroom') || query.includes('room')) {
-      return "Your master bedroom is positioned in the southwest, which is the ideal Vastu direction for the head of the family. It brings stability and restful sleep. 🛏";
+    if (query.includes('master bedroom') || query.includes('master room')) {
+      return 'Master bedroom in South-West is perfect per Vastu. Ideal size 4x4m or larger. Place bed head pointing South or West. Blackout curtains improve sleep quality significantly. 🛏';
     }
-    if (query.includes('budget') || query.includes('price') || query.includes('cost')) {
-      return `Based on your budget of ${currentBudget}, I've allocated 30% for the living room, 25% each for bedrooms and kitchen, and 20% for other areas. Check the shopping list on the left! 💰`;
+    if (query.includes('bedroom') || query.includes('room size') || query.includes('room dimension') || query.includes('room')) {
+      return `For a ${homeType}: Master Bedroom min 4x4m, secondary bedrooms 3.5x3.5m. Children rooms should face East for morning sunlight. Do not place bedrooms directly above the kitchen. 📐`;
     }
-    if (query.includes('pooja') || query.includes('puja') || query.includes('mandir')) {
-      return "The pooja room is placed in the northeast corner (Ishaan corner) — the most auspicious direction in Vastu Shastra. This brings divine blessings to the home. 🪔";
+    if (query.includes('budget') || query.includes('price') || query.includes('cost') || query.includes('estimate') || query.includes('lakh')) {
+      return `For a ${homeType} at ${currentBudget}: ~35% structure and civil, ~25% interior finishing, ~20% furniture and fixtures, ~10% electrical and plumbing, ~10% contingency. See the Budget Breakdown panel on the left for details! 💰`;
     }
-    if (query.includes('furniture') || query.includes('sofa') || query.includes('buy')) {
-      return "I've selected budget-friendly furniture from Pepperfry, Urban Ladder, and IKEA based on your price range. You can see the shopping list in the sidebar with direct links! 🛋";
+    if (query.includes('pooja') || query.includes('puja') || query.includes('mandir') || query.includes('prayer')) {
+      return 'Pooja Room in North-East (Ishaan corner) is the most spiritually auspicious direction. Keep it bright, clean, and at least 1.5x1.5m. Use white marble or granite for the altar platform. 🪔';
     }
-    return "I can help you with: Vastu tips 🙏, furniture recommendations 🛋, room dimensions 📐, budget breakdown 💰, or design modifications ✏️. What would you like to know?";
+    if (query.includes('bathroom') || query.includes('toilet') || query.includes('washroom')) {
+      return 'Bathrooms and toilets belong in West or North-West per Vastu. Never in North-East. Standard size 1.8x2.2m; attached master bath 2.5x3m minimum. Always include a ventilation window or exhaust fan. 🚿';
+    }
+    if (query.includes('living room') || query.includes('hall') || query.includes('drawing room')) {
+      return 'Living room should face North or East for natural light. 2BHK standard: 4.5x5m; 3BHK: 5x6m+. TV on South or East wall, sofa facing North or East. Use warm 3000K lighting for a cozy feel. 🛋';
+    }
+    if (query.includes('balcony') || query.includes('terrace') || query.includes('outdoor')) {
+      return 'North or East-facing balcony is ideal for morning sunlight and positive energy. Minimum 1.5m width. Add potted plants (Tulsi in NE is auspicious!), string lights, and a small bistro set. 🌿';
+    }
+    if (query.includes('dining') || query.includes('eat')) {
+      return 'Dining area should be West or North-West. Head of family faces East while eating. Minimum 3x4m for a 6-seater. Warm pendant lighting (2700K) above the table creates the perfect ambiance. 🍽';
+    }
+    if (query.includes('flooring') || query.includes('floor') || query.includes('tile') || query.includes('marble')) {
+      return 'Top picks: Marble (Rs80-Rs300/sqft), Vitrified Tiles (Rs40-Rs120/sqft), Wooden Laminate (Rs50-Rs150/sqft, warmest feel), Granite (Rs60-Rs200/sqft). For bedrooms, wooden laminate feels the most premium. 🪨';
+    }
+    if (query.includes('color') || query.includes('paint') || query.includes('palette')) {
+      return 'Living Room: warm cream or beige, Bedroom: calm lavender or blue-grey, Kitchen: bright white or light yellow, Pooja Room: golden yellow. Avoid black or dark red in bedrooms per Vastu. 🎨';
+    }
+    if (query.includes('staircase') || query.includes('stairs')) {
+      return 'Staircase belongs in South, West, or South-West per Vastu. Odd number of steps is auspicious (11, 13, 17). Standard: 1-1.2m width, 20cm rise, 25cm tread. Add a feature wall with stone cladding for a premium look. 🏗';
+    }
+    if (query.includes('exterior') || query.includes('facade') || query.includes('elevation')) {
+      return 'Trending: exposed brick or stone cladding, flat roofs with glass railings, large windows. Use anti-algae paint (Asian Paints Apex or Berger WeatherCoat) in terracotta or off-white. Add a covered porch or pergola. 🏠';
+    }
+    if (query.includes('garden') || query.includes('landscape') || query.includes('plant') || query.includes('tree')) {
+      return 'Use the Landscape Preview button (bottom left panel) to decorate your exterior! Vastu tip: Tulsi in North-East, Banana trees in East, avoid thorny plants indoors. Coconut and Neem in South-West bring stability. 🌿';
+    }
+    if (query.includes('hello') || query.includes('hi') || query.includes('namaste') || query.includes('hey')) {
+      return 'Namaste! I am Agni, your AI home design assistant. Ask me about Vastu tips, room dimensions, furniture picks, color palettes, budget estimates, or anything about your home! 🙏';
+    }
+    if (query.includes('furniture') || query.includes('sofa') || query.includes('buy') || query.includes('shop')) {
+      return 'Top furniture brands: Urban Ladder and Pepperfry (mid-range, Rs15K-Rs80K sofas), IKEA (budget-modern), Godrej Interio (durable). Buy beds with storage drawers to maximize space in smaller BHKs. 🛋';
+    }
+    return `I can help you with specific questions about your ${homeType}: Vastu tips for any room 🙏, ideal room sizes and dimensions 📐, budget estimates 💰, furniture and material picks 🛋, color palette suggestions 🎨, kitchen and bathroom design tips. What would you like to know?`;
   };
 
   const toggleChatMic = () => {
@@ -2042,23 +2118,38 @@ export default function Designer() {
 
       </div>
 
+      {/* CHAT BACKDROP — closes drawer when clicking outside */}
+      {showChatDrawer && (
+        <div
+          onClick={() => setShowChatDrawer(false)}
+          style={{
+            position: 'absolute',
+            inset: 0,
+            zIndex: 18,
+            background: 'rgba(0,0,0,0.4)',
+            backdropFilter: 'blur(2px)'
+          }}
+        />
+      )}
+
       {/* COLLAPSIBLE RIGHT CHAT DRAWER PANEL */}
       <div style={{
              position: 'absolute',
              top: 0,
              bottom: 0,
-             zIndex: 10,
+             zIndex: 20,
              display: 'flex',
              flexDirection: 'column',
              right: showChatDrawer ? '0' : '-360px',
              width: '340px',
-             background: 'rgba(10, 11, 18, 0.85)',
+             background: 'rgba(10, 11, 18, 0.92)',
              backdropFilter: 'blur(25px)',
              borderLeft: '1px solid rgba(0, 212, 170, 0.3)',
              boxShadow: '-3px 0 25px rgba(0, 212, 170, 0.15), 0 0 35px rgba(0,0,0,0.85)',
              padding: '1.5rem 1.25rem',
              transition: 'right 0.3s cubic-bezier(0.16, 1, 0.3, 1)',
-             overflow: 'hidden'
+             overflow: 'hidden',
+             pointerEvents: showChatDrawer ? 'all' : 'none'
            }}>
         
         {/* Glow Line Accent on Left Border - Teal color for Chat */}
