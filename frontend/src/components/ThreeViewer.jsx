@@ -356,9 +356,9 @@ function DoorSegment({ globalStyle, wallName, xStart, xEnd, thickness, roomHeigh
         <meshStandardMaterial color={fColor} roughness={fRough} metalness={fMetal} />
       </mesh>
 
-      {/* Door panel itself (Hinged at left side frame, rotated 45 deg outwards) */}
+      {/* Door panel itself (Hinged at left side frame, rotated 45 deg INWARDS) */}
       {!wireframeMode && (
-        <group position={[frameThickness, 0, thickness / 2]} rotation={[0, -Math.PI / 4, 0]}>
+        <group position={[frameThickness, 0, thickness / 2]} rotation={[0, Math.PI / 4, 0]}>
           <mesh position={[(length - frameThickness * 2) / 2, (roomHeight - frameThickness) / 2, 0]} castShadow>
             <boxGeometry args={[length - frameThickness * 2, roomHeight - frameThickness, 0.03]} />
             <meshStandardMaterial color={dColor} roughness={dRough} metalness={dMetal} />
@@ -1303,6 +1303,153 @@ function BlueprintRoom({
   );
 }
 
+// ============================================================================
+// GLOBAL DOOR SYNCHRONIZATION ALGORITHM
+// Pre-computes openings for ALL rooms at once so that shared walls get
+// matching holes on both sides, eliminating ghost gaps / blocked doorways.
+// ============================================================================
+function generateGlobalOpenings(allRooms) {
+  if (!allRooms || allRooms.length === 0) return {};
+
+  const result = {}; // { roomId: [ {type, wall, offset, width}, ... ] }
+  for (const r of allRooms) result[r.id] = [];
+
+  // 1. Build adjacency graph — find which rooms share a wall
+  const adjacency = []; // [{roomA, roomB, wallA, wallB, overlapStart, overlapEnd, overlapLen}]
+  for (let i = 0; i < allRooms.length; i++) {
+    const a = allRooms[i];
+    const ax = a.x, ay = a.y, aw = a.width || a.w, ah = a.height || a.h;
+    for (let j = i + 1; j < allRooms.length; j++) {
+      const b = allRooms[j];
+      const bx = b.x, by = b.y, bw = b.width || b.w, bh = b.height || b.h;
+
+      // A's bottom touches B's top  =>  A.front = B.back
+      if (Math.abs((ay + ah) - by) < 0.15) {
+        const os = Math.max(ax, bx), oe = Math.min(ax + aw, bx + bw);
+        if (oe - os > 0.8) adjacency.push({ a, b, wallA: 'front', wallB: 'back', axis: 'x', os, oe, len: oe - os });
+      }
+      // A's top touches B's bottom  =>  A.back = B.front
+      if (Math.abs(ay - (by + bh)) < 0.15) {
+        const os = Math.max(ax, bx), oe = Math.min(ax + aw, bx + bw);
+        if (oe - os > 0.8) adjacency.push({ a, b, wallA: 'back', wallB: 'front', axis: 'x', os, oe, len: oe - os });
+      }
+      // A's right touches B's left  =>  A.right = B.left
+      if (Math.abs((ax + aw) - bx) < 0.15) {
+        const os = Math.max(ay, by), oe = Math.min(ay + ah, by + bh);
+        if (oe - os > 0.8) adjacency.push({ a, b, wallA: 'right', wallB: 'left', axis: 'y', os, oe, len: oe - os });
+      }
+      // A's left touches B's right  =>  A.left = B.right
+      if (Math.abs(ax - (bx + bw)) < 0.15) {
+        const os = Math.max(ay, by), oe = Math.min(ay + ah, by + bh);
+        if (oe - os > 0.8) adjacency.push({ a, b, wallA: 'left', wallB: 'right', axis: 'y', os, oe, len: oe - os });
+      }
+    }
+  }
+
+  // 2. Find the "main" room (Living Room / Corridor / Hall) — BFS root
+  const mainRoom = allRooms.find(r => {
+    const n = (r.name || '').toLowerCase();
+    return n.includes('living') || n.includes('corridor') || n.includes('hall') || n.includes('foyer');
+  }) || allRooms[0];
+
+  // 3. BFS to connect every room via internal doors
+  const visited = new Set();
+  const queue = [mainRoom.id];
+  visited.add(mainRoom.id);
+
+  while (queue.length > 0) {
+    const currentId = queue.shift();
+    // Find all adjacencies involving this room
+    for (const edge of adjacency) {
+      let neighbor, wallCurrent, wallNeighbor, axisRef, overlapStart, overlapEnd;
+      if (edge.a.id === currentId && !visited.has(edge.b.id)) {
+        neighbor = edge.b; wallCurrent = edge.wallA; wallNeighbor = edge.wallB;
+        axisRef = edge.axis; overlapStart = edge.os; overlapEnd = edge.oe;
+      } else if (edge.b.id === currentId && !visited.has(edge.a.id)) {
+        neighbor = edge.a; wallCurrent = edge.wallB; wallNeighbor = edge.wallA;
+        axisRef = edge.axis; overlapStart = edge.os; overlapEnd = edge.oe;
+      } else {
+        continue;
+      }
+
+      visited.add(neighbor.id);
+      queue.push(neighbor.id);
+
+      // Calculate door placement in local coordinates for each room
+      const doorWidth = 0.9;
+      const overlapMid = (overlapStart + overlapEnd) / 2;
+
+      const currentRoom = allRooms.find(r => r.id === currentId);
+      const cBaseX = currentRoom.x, cBaseY = currentRoom.y;
+      const nBaseX = neighbor.x, nBaseY = neighbor.y;
+
+      let offsetCurrent, offsetNeighbor;
+      if (axisRef === 'x') {
+        // horizontal wall — offset is along X
+        offsetCurrent = overlapMid - cBaseX - doorWidth / 2;
+        offsetNeighbor = overlapMid - nBaseX - doorWidth / 2;
+      } else {
+        // vertical wall — offset is along Y
+        offsetCurrent = overlapMid - cBaseY - doorWidth / 2;
+        offsetNeighbor = overlapMid - nBaseY - doorWidth / 2;
+      }
+
+      // Clamp offsets to valid range
+      const cDim = axisRef === 'x' ? (currentRoom.width || currentRoom.w) : (currentRoom.height || currentRoom.h);
+      const nDim = axisRef === 'x' ? (neighbor.width || neighbor.w) : (neighbor.height || neighbor.h);
+      offsetCurrent = Math.max(0.15, Math.min(offsetCurrent, cDim - doorWidth - 0.15));
+      offsetNeighbor = Math.max(0.15, Math.min(offsetNeighbor, nDim - doorWidth - 0.15));
+
+      // Push matching door to BOTH rooms
+      result[currentId].push({ type: 'door', wall: wallCurrent, offset: offsetCurrent, width: doorWidth });
+      result[neighbor.id].push({ type: 'door', wall: wallNeighbor, offset: offsetNeighbor, width: doorWidth });
+    }
+  }
+
+  // 4. Main entry door on an exterior wall of the main room
+  const mainRoomData = allRooms.find(r => r.id === mainRoom.id);
+  const mx = mainRoomData.x, my = mainRoomData.y;
+  const mw = mainRoomData.width || mainRoomData.w, mh = mainRoomData.height || mainRoomData.h;
+
+  // Find which walls of the main room are NOT shared (exterior)
+  const sharedWalls = new Set();
+  for (const edge of adjacency) {
+    if (edge.a.id === mainRoom.id) sharedWalls.add(edge.wallA);
+    if (edge.b.id === mainRoom.id) sharedWalls.add(edge.wallB);
+  }
+  const exteriorPref = ['front', 'left', 'back', 'right'];
+  const entryWall = exteriorPref.find(w => !sharedWalls.has(w)) || 'front';
+  const entryDim = (entryWall === 'front' || entryWall === 'back') ? mw : mh;
+  const entryOffset = Math.max(0.2, entryDim / 2 - 0.6);
+  result[mainRoom.id].push({ type: 'door', wall: entryWall, offset: entryOffset, width: 1.2 });
+
+  // 5. Windows on exterior walls for every room
+  for (const room of allRooms) {
+    const rx = room.x, ry = room.y;
+    const rw = room.width || room.w, rh = room.height || room.h;
+    const roomShared = new Set();
+    for (const edge of adjacency) {
+      if (edge.a.id === room.id) roomShared.add(edge.wallA);
+      if (edge.b.id === room.id) roomShared.add(edge.wallB);
+    }
+    // Place a window on the first available exterior wall that doesn't already have a door
+    const wallOrder = ['back', 'right', 'front', 'left'];
+    for (const wn of wallOrder) {
+      if (roomShared.has(wn)) continue; // skip shared/internal walls
+      const dim = (wn === 'front' || wn === 'back') ? rw : rh;
+      if (dim < 1.2) continue; // wall too short for a window
+      // Check if a door is already on this wall
+      const hasDoor = result[room.id].some(o => o.wall === wn && o.type === 'door');
+      const winWidth = Math.min(dim - 0.6, 1.2);
+      const winOffset = hasDoor ? Math.max(0.2, dim - winWidth - 0.3) : Math.max(0.2, dim / 2 - winWidth / 2);
+      result[room.id].push({ type: 'window', wall: wn, offset: winOffset, width: winWidth });
+      break; // one window per room is enough as a default
+    }
+  }
+
+  return result;
+}
+
 // Room Renderer combining slab floor, layers overlays, and surrounding architectural walls
 function Room({ 
   data, 
@@ -1320,7 +1467,8 @@ function Room({
   placeMode,
   onAddOpening,
   allRooms,
-  globalStyle
+  globalStyle,
+  globalOpenings
 }) {
   const { width, height, x, y, color, name, floor = 0 } = data;
   if (width < 0.2 || height < 0.2) return null;
@@ -1359,54 +1507,16 @@ function Room({
   // Calculate wall segments for adjacency awareness
   const walls = useMemo(() => getWallSegmentsForRoom(data, allRooms || []), [data, allRooms]);
 
-  // Filter out openings with intelligent defaults
+  // Use globally synchronized openings (doors + windows pre-computed for all rooms)
+  // This ensures shared walls get matching holes on BOTH sides — no ghost gaps.
   const openings = useMemo(() => {
+    // If user/AI explicitly set openings on this room, honour them
     if (data.openings) return data.openings;
-
-    // Smart default openings based on room position & shared walls
-    const isMainRoom = data.name.toLowerCase().includes('living') || data.name.toLowerCase().includes('corridor');
-    let shared = null;
-    let unshared = null;
-    let fallbackUnshared = null;
-
-    const checkWall = (wallArr, wallName, localStartOffset) => {
-      for (let s of wallArr) {
-        const segLen = s.end - s.start;
-        if (s.isShared && segLen > 0.8 && !shared) {
-           shared = { wall: wallName, offset: Math.max(0.2, localStartOffset(s) + segLen/2 - 0.45) };
-        }
-        if (!s.isShared && segLen > 1.0) {
-           if (!unshared) unshared = { wall: wallName, offset: Math.max(0.2, localStartOffset(s) + segLen/2 - 0.6) };
-           fallbackUnshared = { wall: wallName, offset: Math.max(0.2, localStartOffset(s) + segLen/2 - 0.45) };
-        }
-      }
-    };
-    
-    checkWall(walls.bottom, 'front', s => s.start - x);
-    checkWall(walls.top, 'back', s => s.start - x);
-    checkWall(walls.left, 'left', s => s.start - y);
-    checkWall(walls.right, 'right', s => s.start - y);
-
-    const defaultOpenings = [];
-
-    if (isMainRoom) {
-      // Main room gets its door on an unshared (exterior) wall
-      defaultOpenings.push({ type: 'door', wall: fallbackUnshared ? fallbackUnshared.wall : 'front', offset: fallbackUnshared ? fallbackUnshared.offset : 0.5, width: 1.2 });
-      // If it connects to internal rooms, put an interior door too (open archway or door)
-      if (shared) defaultOpenings.push({ type: 'door', wall: shared.wall, offset: shared.offset, width: 1.5 });
-    } else {
-      // Other rooms (Master Bedroom, Kitchen, etc) get their door on a shared (interior) wall
-      defaultOpenings.push({ type: 'door', wall: shared ? shared.wall : 'front', offset: shared ? shared.offset : 0.5, width: 0.9 });
-      // And a window on an unshared (exterior) wall
-      if (unshared) defaultOpenings.push({ type: 'window', wall: unshared.wall, offset: unshared.offset, width: 1.2 });
-    }
-
-    if (defaultOpenings.length === 0) {
-      defaultOpenings.push({ type: 'door', wall: 'front', offset: 0.5, width: 0.9 });
-      defaultOpenings.push({ type: 'window', wall: 'back', offset: Math.max(0.5, width / 2 - 0.6), width: Math.min(width - 1.0, 1.2) });
-    }
-    return defaultOpenings;
-  }, [data.openings, width, x, y, data.name, walls]);
+    // Otherwise use the global algorithm's output
+    if (globalOpenings && globalOpenings[data.id]) return globalOpenings[data.id];
+    // Absolute fallback
+    return [{ type: 'door', wall: 'front', offset: 0.5, width: 0.9 }];
+  }, [data.openings, data.id, globalOpenings]);
 
   if (!isFloorActive) {
     // Isolated outlines for unselected floor level stacks
@@ -2431,6 +2541,10 @@ export default function ThreeViewer({
   
   if (!floorPlan || !floorPlan.rooms) return null;
 
+  // Pre-compute globally synchronized door & window openings for ALL rooms.
+  // This guarantees shared walls get matching holes on BOTH sides — no ghost gaps.
+  const globalOpenings = useMemo(() => generateGlobalOpenings(floorPlan.rooms), [floorPlan.rooms]);
+
   // 1. Calculate Sun Position (math based on Facing & Time slider)
   // Time ranges from 6 (6AM) to 18 (6PM). Pivot around 12 (Noon).
   const sunData = useMemo(() => {
@@ -2537,6 +2651,7 @@ export default function ThreeViewer({
             onHover={onHoverRoom}
             wireframeMode={wireframeMode}
             activeFloor={activeFloor}
+            globalOpenings={globalOpenings}
             
             // New CAD Layer inputs
             blueprintMode={blueprintMode}

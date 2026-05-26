@@ -271,13 +271,8 @@ async function generateFloorPlan(description, preferences = {}, forceHybrid = fa
         room.width = parseFloat((room.width * budgetScale).toFixed(1));
         room.height = parseFloat((room.height * budgetScale).toFixed(1));
         
-        // Procedural variance based on room ID hash (reproducible yet unique for each prompt)
-        const seed = hashCode(room.id + (description || ""));
-        const widthVar = 0.85 + (Math.abs(seed % 30) / 100); // 0.85 to 1.15
-        const heightVar = 0.85 + (Math.abs((seed * 3) % 30) / 100);
-        
-        room.width = parseFloat((room.width * widthVar).toFixed(1));
-        room.height = parseFloat((room.height * heightVar).toFixed(1));
+        // Removed procedural random decimal variance to preserve exact rectangular packing
+        // The sizes will remain strictly as defined in the grid templates
         
         if (room.width < 1.5) room.width = 1.5;
         if (room.height < 1.5) room.height = 1.5;
@@ -307,12 +302,7 @@ async function generateFloorPlan(description, preferences = {}, forceHybrid = fa
           r.width = parseFloat((r.width * budgetScale).toFixed(1));
           r.height = parseFloat((r.height * budgetScale).toFixed(1));
           
-          const seed = hashCode(r.id + (description || "") + f);
-          const widthVar = 0.9 + (Math.abs(seed % 20) / 100); // 0.9 to 1.1
-          const heightVar = 0.9 + (Math.abs((seed * 7) % 20) / 100);
-          r.width = parseFloat((r.width * widthVar).toFixed(1));
-          r.height = parseFloat((r.height * heightVar).toFixed(1));
-          
+          // Removed procedural random decimal variance to preserve exact rectangular packing
           if (r.width < 1.5) r.width = 1.5;
           if (r.height < 1.5) r.height = 1.5;
         }
@@ -400,9 +390,15 @@ The layout must strictly adhere to classic Vastu Shastra rules:
 
 STRICT RECTANGULAR BOUNDING BOX RULE (CRITICAL):
 - You MUST design the layout so that all rooms tessellate perfectly into a single, seamless rectangular outer bounding box. 
+- Pair large rooms with adjacent smaller rooms of matching width or height to ensure flush borders.
 - The sum of widths across any horizontal row must exactly equal the total width of the house.
 - The sum of heights across any vertical column must exactly equal the total height of the house.
 - There should be absolutely no jagged exterior boundaries, protruding rooms, or empty missing gaps in the floor plan. It must be a perfect puzzle.
+
+DOOR CONNECTIVITY & ADJACENCY RULES (CRITICAL):
+- Rooms must physically share at least 0.8 meters of wall overlap (same x or y boundaries) for a door to be generated between them.
+- Ensure the Living Room shares at least a 0.8m wall overlap with the Kitchen and the Pooja Room, so doors can be placed.
+- NEVER place a Servant Room or Maid's Room next to the Master Bedroom. Servant rooms must be placed near the Kitchen or an exterior boundary.
 
 MULTI-STOREY / APARTMENT STRUCTURAL RULES:
 - Every room MUST include an integer "floor" attribute (default 0 for Ground Floor, 1 for 1st Floor, 2 for 2nd Floor, etc.).
