@@ -1359,13 +1359,54 @@ function Room({
   // Calculate wall segments for adjacency awareness
   const walls = useMemo(() => getWallSegmentsForRoom(data, allRooms || []), [data, allRooms]);
 
-  // Filter out openings
+  // Filter out openings with intelligent defaults
   const openings = useMemo(() => {
-    return data.openings || [
-      { type: 'door', wall: 'front', offset: 0.5, width: 0.9 },
-      { type: 'window', wall: 'back', offset: Math.max(0.5, width / 2 - 0.6), width: Math.min(width - 1.0, 1.2) }
-    ];
-  }, [data.openings, width]);
+    if (data.openings) return data.openings;
+
+    // Smart default openings based on room position & shared walls
+    const isMainRoom = data.name.toLowerCase().includes('living') || data.name.toLowerCase().includes('corridor');
+    let shared = null;
+    let unshared = null;
+    let fallbackUnshared = null;
+
+    const checkWall = (wallArr, wallName, localStartOffset) => {
+      for (let s of wallArr) {
+        const segLen = s.end - s.start;
+        if (s.isShared && segLen > 0.8 && !shared) {
+           shared = { wall: wallName, offset: Math.max(0.2, localStartOffset(s) + segLen/2 - 0.45) };
+        }
+        if (!s.isShared && segLen > 1.0) {
+           if (!unshared) unshared = { wall: wallName, offset: Math.max(0.2, localStartOffset(s) + segLen/2 - 0.6) };
+           fallbackUnshared = { wall: wallName, offset: Math.max(0.2, localStartOffset(s) + segLen/2 - 0.45) };
+        }
+      }
+    };
+    
+    checkWall(walls.bottom, 'front', s => s.start - x);
+    checkWall(walls.top, 'back', s => s.start - x);
+    checkWall(walls.left, 'left', s => s.start - y);
+    checkWall(walls.right, 'right', s => s.start - y);
+
+    const defaultOpenings = [];
+
+    if (isMainRoom) {
+      // Main room gets its door on an unshared (exterior) wall
+      defaultOpenings.push({ type: 'door', wall: fallbackUnshared ? fallbackUnshared.wall : 'front', offset: fallbackUnshared ? fallbackUnshared.offset : 0.5, width: 1.2 });
+      // If it connects to internal rooms, put an interior door too (open archway or door)
+      if (shared) defaultOpenings.push({ type: 'door', wall: shared.wall, offset: shared.offset, width: 1.5 });
+    } else {
+      // Other rooms (Master Bedroom, Kitchen, etc) get their door on a shared (interior) wall
+      defaultOpenings.push({ type: 'door', wall: shared ? shared.wall : 'front', offset: shared ? shared.offset : 0.5, width: 0.9 });
+      // And a window on an unshared (exterior) wall
+      if (unshared) defaultOpenings.push({ type: 'window', wall: unshared.wall, offset: unshared.offset, width: 1.2 });
+    }
+
+    if (defaultOpenings.length === 0) {
+      defaultOpenings.push({ type: 'door', wall: 'front', offset: 0.5, width: 0.9 });
+      defaultOpenings.push({ type: 'window', wall: 'back', offset: Math.max(0.5, width / 2 - 0.6), width: Math.min(width - 1.0, 1.2) });
+    }
+    return defaultOpenings;
+  }, [data.openings, width, x, y, data.name, walls]);
 
   if (!isFloorActive) {
     // Isolated outlines for unselected floor level stacks
