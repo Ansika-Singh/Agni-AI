@@ -97,6 +97,7 @@ function resolveOverlaps(rooms) {
         if (i === j) continue;
         const r1 = rooms[i];
         const r2 = rooms[j];
+        if ((r1.floor || 0) !== (r2.floor || 0)) continue;
         
         const overlapX = Math.min(r1.x + r1.width, r2.x + r2.width) - Math.max(r1.x, r2.x);
         const overlapY = Math.min(r1.y + r1.height, r2.y + r2.height) - Math.max(r1.y, r2.y);
