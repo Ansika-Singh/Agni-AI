@@ -41,12 +41,13 @@ async function callGemini(systemInstruction, prompt, isJson = false) {
   }
 
   return new Promise((resolve, reject) => {
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent`;
     const dataString = JSON.stringify(payload);
 
     const options = {
       method: 'POST',
       headers: {
+        'x-goog-api-key': apiKey,
         'Content-Type': 'application/json',
         'Content-Length': Buffer.byteLength(dataString)
       },
@@ -464,10 +465,20 @@ Ensure all room boundaries are logical (e.g. Master Bedroom is at least 4x4, Poo
 
   try {
     const rawJson = await callGemini(systemInstruction, prompt, true);
-    const parsed = JSON.parse(rawJson);
-    if (parsed.rooms && Array.isArray(parsed.rooms)) {
-      parsed.rooms = resolveOverlaps(parsed.rooms);
+    let parsed;
+    try {
+      parsed = JSON.parse(rawJson);
+    } catch (parseErr) {
+      console.error('Gemini Floor Plan Parse Error:', parseErr.message, rawJson);
+      throw parseErr;
     }
+    
+    // Validate schema
+    if (!parsed || !parsed.rooms || !Array.isArray(parsed.rooms)) {
+      throw new Error('Invalid Floor Plan JSON schema from Gemini: missing rooms array');
+    }
+    
+    parsed.rooms = resolveOverlaps(parsed.rooms);
     return parsed;
   } catch (err) {
     console.error('Gemini Floor Plan Generation Error:', err.message);
@@ -521,7 +532,19 @@ You MUST return valid JSON matching this exact schema:
 
   try {
     const rawJson = await callGemini(systemInstruction, prompt, true);
-    return JSON.parse(rawJson);
+    let parsed;
+    try {
+      parsed = JSON.parse(rawJson);
+    } catch (parseErr) {
+      console.error('Gemini Vastu Score Parse Error:', parseErr.message, rawJson);
+      throw parseErr;
+    }
+    
+    // Validate schema
+    if (typeof parsed.score !== 'number' || !Array.isArray(parsed.suggestions)) {
+      throw new Error('Invalid Vastu Score JSON schema from Gemini');
+    }
+    return parsed;
   } catch (err) {
     console.error('Gemini Vastu Score Error:', err.message);
     return { score: 75, grade: 'B', suggestions: [] };
