@@ -328,7 +328,8 @@ export default function Designer() {
     }
   }, [chatMessages, showChatDrawer]);
 
-  const openChatDrawer = () => {
+  const openChatDrawer = (e) => {
+    if(e) { e.stopPropagation(); e.preventDefault(); }
     setShowChatDrawer(true);
     setShowInspector(false); // Mutual exclusion
   };
@@ -2018,8 +2019,14 @@ export default function Designer() {
           <h3 className="text-sm" style={{ fontWeight: 800, color: 'white', fontFamily: 'var(--font-display)' }}>🛠️ Inspector</h3>
           <button 
             className="btn btn-ghost btn-sm" 
-            onClick={() => { setSelectedRoomId(null); setShowInspector(false); }}
-            style={{ padding: '0.15rem 0.5rem', fontSize: '0.7rem', borderRadius: '4px', cursor: 'pointer' }}
+            onClick={(e) => { 
+              e.stopPropagation(); 
+              e.preventDefault(); 
+              console.log("Inspector Close button clicked!");
+              setSelectedRoomId(null); 
+              setShowInspector(false); 
+            }}
+            style={{ padding: '0.15rem 0.5rem', fontSize: '0.7rem', borderRadius: '4px', cursor: 'pointer', position: 'relative', zIndex: 9999 }}
           >
             Close ✕
           </button>
@@ -2197,7 +2204,7 @@ export default function Designer() {
           </h3>
           <button 
             className="btn btn-ghost btn-sm" 
-            onClick={() => setShowChatDrawer(false)}
+            onClick={(e) => { e.stopPropagation(); e.preventDefault(); setShowChatDrawer(false); }}
             style={{ padding: '0.15rem 0.5rem', fontSize: '0.7rem', borderRadius: '4px', cursor: 'pointer' }}
           >
             Close ✕

@@ -184,7 +184,7 @@ export default function VoiceBot({ currentPlan = 'Starter', onBlockTrigger }) {
           <span className="text-fire">🎙️</span> Agni Assistant
         </h3>
         <button 
-          onClick={() => setIsOpen(false)}
+          onClick={(e) => { e.stopPropagation(); setIsOpen(false); }}
           className="btn btn-ghost btn-sm"
           style={{ padding: '0.15rem 0.45rem', fontSize: '0.7rem', borderRadius: '4px' }}
         >

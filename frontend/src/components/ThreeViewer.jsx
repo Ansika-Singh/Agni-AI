@@ -370,12 +370,12 @@ function DoorSegment({ globalStyle, wallName, xStart, xEnd, thickness, roomHeigh
 }
 
 // 4. Group Wall Assembler (coordinates outer, inner, and openings offsets)
-function ArchitecturalWall({ globalStyle, wallName, length, thickness, roomHeight, openings, color, isSelected, blueprintMode, wireframeMode, onClick, onAddOpening }) {
+function ArchitecturalWall({ globalStyle, wallName, length, thickness, roomHeight, openings, color, isSelected, blueprintMode, wireframeMode, onClick, onAddOpening, placeMode }) {
   const wallOpenings = openings.filter(o => o.wall === wallName);
 
   const handleClick = (e) => {
-    e.stopPropagation();
-    if (onAddOpening) {
+    if (e) e.stopPropagation();
+    if (placeMode !== 'select' && onAddOpening) {
       onAddOpening();
     } else if (onClick) {
       onClick(e);
@@ -390,6 +390,7 @@ function ArchitecturalWall({ globalStyle, wallName, length, thickness, roomHeigh
         thickness={thickness} 
         roomHeight={roomHeight} 
         color={color} 
+        globalStyle={globalStyle}
         isSelected={isSelected} 
         blueprintMode={blueprintMode} 
         wireframeMode={wireframeMode}
@@ -413,6 +414,7 @@ function ArchitecturalWall({ globalStyle, wallName, length, thickness, roomHeigh
           thickness={thickness} 
           roomHeight={roomHeight} 
           color={color} 
+          globalStyle={globalStyle}
           isSelected={isSelected} 
           blueprintMode={blueprintMode} 
           wireframeMode={wireframeMode}
@@ -431,10 +433,11 @@ function ArchitecturalWall({ globalStyle, wallName, length, thickness, roomHeigh
           thickness={thickness} 
           roomHeight={roomHeight} 
           color={color} 
+          globalStyle={globalStyle}
           isSelected={isSelected} 
           blueprintMode={blueprintMode} 
           wireframeMode={wireframeMode}
-          onClick={onClick} 
+          onClick={handleClick} 
         />
       );
     } else if (op.type === 'door') {
@@ -447,10 +450,11 @@ function ArchitecturalWall({ globalStyle, wallName, length, thickness, roomHeigh
           thickness={thickness} 
           roomHeight={roomHeight} 
           color={color} 
+          globalStyle={globalStyle}
           isSelected={isSelected} 
           blueprintMode={blueprintMode} 
           wireframeMode={wireframeMode}
-          onClick={onClick} 
+          onClick={handleClick} 
         />
       );
     }
@@ -468,10 +472,11 @@ function ArchitecturalWall({ globalStyle, wallName, length, thickness, roomHeigh
         thickness={thickness} 
         roomHeight={roomHeight} 
         color={color} 
+        globalStyle={globalStyle}
         isSelected={isSelected} 
         blueprintMode={blueprintMode} 
         wireframeMode={wireframeMode}
-        onClick={onClick} 
+        onClick={handleClick} 
       />
     );
   }
@@ -1317,6 +1322,9 @@ function Room({
   allRooms,
   globalStyle
 }) {
+  const { width, height, x, y, color, name, floor = 0 } = data;
+  if (width < 0.2 || height < 0.2) return null;
+
   if (blueprintMode) {
     return (
       <BlueprintRoom
@@ -1337,18 +1345,20 @@ function Room({
     );
   }
 
-  const { width, height, x, y, color, name, floor = 0 } = data;
   const roomHeight = 1.2;
   const floorHeight = 1.6;
   const verticalOffset = floor * floorHeight;
   
   // Outer external brick thickness (230mm) or Partition internal (150mm)
   const isWetRoom = name.toLowerCase().includes('toilet') || name.toLowerCase().includes('bath') || name.toLowerCase().includes('kitchen');
-  const t = name.toLowerCase().includes('hall') || name.toLowerCase().includes('living') ? 0.23 : 0.15;
+  const t = 0.2; 
 
   const isAllVisible = activeFloor === 'all' || activeFloor === undefined || activeFloor === null;
   const isFloorActive = isAllVisible || floor === activeFloor;
   
+  // Calculate wall segments for adjacency awareness
+  const walls = useMemo(() => getWallSegmentsForRoom(data, allRooms || []), [data, allRooms]);
+
   // Filter out openings
   const openings = useMemo(() => {
     return data.openings || [
@@ -1417,77 +1427,161 @@ function Room({
       {/* B. ARCHITECTURAL WALL SECTIONS (LAYER: STRUCTURE) */}
       {structureLayer && (
         <group>
-          {/* 1. Back Wall: positioned along Z = 0, length = width */}
-          <group position={[0, 0, 0]} rotation={[0, 0, 0]}>
-            <ArchitecturalWall 
-              globalStyle={globalStyle}
-              wallName="back" 
-              length={width} 
-              thickness={t} 
-              roomHeight={roomHeight} 
-              openings={openings} 
-              color={color} 
-              isSelected={isSelected} 
-              blueprintMode={blueprintMode} 
-              wireframeMode={wireframeMode}
-              onClick={onSelect}
-              onAddOpening={placeMode !== 'select' ? () => onAddOpening('back') : undefined}
-            />
-          </group>
+          {/* 1. Back Wall segments */}
+          {walls.top.map((seg, idx) => {
+            const xStart = seg.start - x;
+            const xEnd = seg.end - x;
+            const segLength = xEnd - xStart;
+            if (segLength <= 0.05) return null;
 
-          {/* 2. Front Wall: positioned along Z = height - t, length = width */}
-          <group position={[0, 0, height - t]} rotation={[0, 0, 0]}>
-            <ArchitecturalWall 
-              globalStyle={globalStyle}
-              wallName="front" 
-              length={width} 
-              thickness={t} 
-              roomHeight={roomHeight} 
-              openings={openings} 
-              color={color} 
-              isSelected={isSelected} 
-              blueprintMode={blueprintMode} 
-              wireframeMode={wireframeMode}
-              onClick={onSelect}
-              onAddOpening={placeMode !== 'select' ? () => onAddOpening('front') : undefined}
-            />
-          </group>
+            // De-duplicate shared walls in 3D: only render on the room with smaller id
+            if (seg.isShared) {
+              const other = allRooms?.find(o => 
+                o.id !== data.id &&
+                (o.floor || 0) === floor &&
+                Math.abs((o.y + (o.height || o.h)) - y) < 0.1 &&
+                Math.max(x, o.x) < Math.min(x + width, o.x + (o.width || o.w)) - 0.1
+              );
+              if (other && data.id > other.id) return null;
+            }
 
-          {/* 3. Left Wall: positioned along X = 0, between the front/back walls */}
-          <group position={[0, 0, t]} rotation={[0, Math.PI / 2, 0]}>
-            <ArchitecturalWall 
-              globalStyle={globalStyle}
-              wallName="left" 
-              length={height - 2 * t} 
-              thickness={t} 
-              roomHeight={roomHeight} 
-              openings={openings} 
-              color={color} 
-              isSelected={isSelected} 
-              blueprintMode={blueprintMode} 
-              wireframeMode={wireframeMode}
-              onClick={onSelect}
-              onAddOpening={placeMode !== 'select' ? () => onAddOpening('left') : undefined}
-            />
-          </group>
+            return (
+              <group key={`back-seg-${idx}`} position={[xStart, 0, 0]} rotation={[0, 0, 0]}>
+                <ArchitecturalWall 
+                  globalStyle={globalStyle}
+                  wallName="back" 
+                  length={segLength} 
+                  thickness={t} 
+                  roomHeight={roomHeight} 
+                  openings={openings.map(o => ({...o, offset: o.offset - xStart})).filter(o => o.wall === 'back' && o.offset >= 0 && o.offset + o.width <= segLength)} 
+                  color={color} 
+                  isSelected={isSelected} 
+                  blueprintMode={blueprintMode} 
+                  wireframeMode={wireframeMode}
+                  onClick={onSelect}
+                  onAddOpening={placeMode !== 'select' ? () => onAddOpening('back') : undefined}
+                  placeMode={placeMode}
+                />
+              </group>
+            );
+          })}
 
-          {/* 4. Right Wall: positioned along X = width - t, between front/back walls */}
-          <group position={[width - t, 0, t]} rotation={[0, Math.PI / 2, 0]}>
-            <ArchitecturalWall 
-              globalStyle={globalStyle}
-              wallName="right" 
-              length={height - 2 * t} 
-              thickness={t} 
-              roomHeight={roomHeight} 
-              openings={openings} 
-              color={color} 
-              isSelected={isSelected} 
-              blueprintMode={blueprintMode} 
-              wireframeMode={wireframeMode}
-              onClick={onSelect}
-              onAddOpening={placeMode !== 'select' ? () => onAddOpening('right') : undefined}
-            />
-          </group>
+          {/* 2. Front Wall segments */}
+          {walls.bottom.map((seg, idx) => {
+            const xStart = seg.start - x;
+            const xEnd = seg.end - x;
+            const segLength = xEnd - xStart;
+            if (segLength <= 0.05) return null;
+
+            // De-duplicate shared walls in 3D: only render on the room with smaller id
+            if (seg.isShared) {
+              const other = allRooms?.find(o => 
+                o.id !== data.id &&
+                (o.floor || 0) === floor &&
+                Math.abs(o.y - (y + height)) < 0.1 &&
+                Math.max(x, o.x) < Math.min(x + width, o.x + (o.width || o.w)) - 0.1
+              );
+              if (other && data.id > other.id) return null;
+            }
+
+            return (
+              <group key={`front-seg-${idx}`} position={[xStart, 0, height - t]} rotation={[0, 0, 0]}>
+                <ArchitecturalWall 
+                  globalStyle={globalStyle}
+                  wallName="front" 
+                  length={segLength} 
+                  thickness={t} 
+                  roomHeight={roomHeight} 
+                  openings={openings.map(o => ({...o, offset: o.offset - xStart})).filter(o => o.wall === 'front' && o.offset >= 0 && o.offset + o.width <= segLength)} 
+                  color={color} 
+                  isSelected={isSelected} 
+                  blueprintMode={blueprintMode} 
+                  wireframeMode={wireframeMode}
+                  onClick={onSelect}
+                  onAddOpening={placeMode !== 'select' ? () => onAddOpening('front') : undefined}
+                  placeMode={placeMode}
+                />
+              </group>
+            );
+          })}
+
+          {/* 3. Left Wall segments */}
+          {walls.left.map((seg, idx) => {
+            const zStart = seg.start - y;
+            const zEnd = seg.end - y;
+            const segLength = zEnd - zStart;
+            if (segLength <= 0.05) return null;
+
+            // De-duplicate shared walls in 3D: only render on the room with smaller id
+            if (seg.isShared) {
+              const other = allRooms?.find(o => 
+                o.id !== data.id &&
+                (o.floor || 0) === floor &&
+                Math.abs((o.x + (o.width || o.w)) - x) < 0.1 &&
+                Math.max(y, o.y) < Math.min(y + height, o.y + (o.height || o.h)) - 0.1
+              );
+              if (other && data.id > other.id) return null;
+            }
+
+            return (
+              <group key={`left-seg-${idx}`} position={[t, 0, zStart]} rotation={[0, -Math.PI / 2, 0]}>
+                <ArchitecturalWall 
+                  globalStyle={globalStyle}
+                  wallName="left" 
+                  length={segLength} 
+                  thickness={t} 
+                  roomHeight={roomHeight} 
+                  openings={openings.map(o => ({...o, offset: o.offset - zStart})).filter(o => o.wall === 'left' && o.offset >= 0 && o.offset + o.width <= segLength)} 
+                  color={color} 
+                  isSelected={isSelected} 
+                  blueprintMode={blueprintMode} 
+                  wireframeMode={wireframeMode}
+                  onClick={onSelect}
+                  onAddOpening={placeMode !== 'select' ? () => onAddOpening('left') : undefined}
+                  placeMode={placeMode}
+                />
+              </group>
+            );
+          })}
+
+          {/* 4. Right Wall segments */}
+          {walls.right.map((seg, idx) => {
+            const zStart = seg.start - y;
+            const zEnd = seg.end - y;
+            const segLength = zEnd - zStart;
+            if (segLength <= 0.05) return null;
+
+            // De-duplicate shared walls in 3D: only render on the room with smaller id
+            if (seg.isShared) {
+              const other = allRooms?.find(o => 
+                o.id !== data.id &&
+                (o.floor || 0) === floor &&
+                Math.abs(o.x - (x + width)) < 0.1 &&
+                Math.max(y, o.y) < Math.min(y + height, o.y + (o.height || o.h)) - 0.1
+              );
+              if (other && data.id > other.id) return null;
+            }
+
+            return (
+              <group key={`right-seg-${idx}`} position={[width, 0, zStart]} rotation={[0, -Math.PI / 2, 0]}>
+                <ArchitecturalWall 
+                  globalStyle={globalStyle}
+                  wallName="right" 
+                  length={segLength} 
+                  thickness={t} 
+                  roomHeight={roomHeight} 
+                  openings={openings.map(o => ({...o, offset: o.offset - zStart})).filter(o => o.wall === 'right' && o.offset >= 0 && o.offset + o.width <= segLength)} 
+                  color={color} 
+                  isSelected={isSelected} 
+                  blueprintMode={blueprintMode} 
+                  wireframeMode={wireframeMode}
+                  onClick={onSelect}
+                  onAddOpening={placeMode !== 'select' ? () => onAddOpening('right') : undefined}
+                  placeMode={placeMode}
+                />
+              </group>
+            );
+          })}
         </group>
       )}
 
