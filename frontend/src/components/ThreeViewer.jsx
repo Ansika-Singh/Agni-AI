@@ -116,7 +116,7 @@ function getWallSegmentsForRoom(room, allRooms) {
 }
 
 // 1. Solid Wall Segment Mesh
-function SolidWallSegment({ xStart, xEnd, thickness, roomHeight, color, isSelected, blueprintMode, wireframeMode, onClick }) {
+function SolidWallSegment({ globalStyle, xStart, xEnd, thickness, roomHeight, color, isSelected, blueprintMode, wireframeMode, onClick }) {
   const length = xEnd - xStart;
   if (length <= 0.001) return null;
 
@@ -136,9 +136,9 @@ function SolidWallSegment({ xStart, xEnd, thickness, roomHeight, color, isSelect
     <mesh position={position} castShadow receiveShadow onClick={onClick}>
       <boxGeometry args={[length, roomHeight, thickness]} />
       <meshStandardMaterial 
-        color={color} 
-        roughness={0.4} 
-        metalness={0.1} 
+        color={globalStyle === 'Traditional Indian' ? "#e6bca5" : (globalStyle === 'Royal/Heritage' ? "#fdfbf7" : color)} 
+        roughness={globalStyle === 'Traditional Indian' ? 0.8 : (globalStyle === 'Royal/Heritage' ? 0.1 : 0.4)} 
+        metalness={globalStyle === 'Royal/Heritage' ? 0.3 : 0.1} 
         transparent 
         opacity={wireframeMode ? 0.3 : 1.0}
         wireframe={wireframeMode}
@@ -149,7 +149,13 @@ function SolidWallSegment({ xStart, xEnd, thickness, roomHeight, color, isSelect
 }
 
 // 2. Window Segment with Sill, Header, Frame and Glazing
-function WindowSegment({ xStart, xEnd, thickness, roomHeight, color, isSelected, blueprintMode, wireframeMode, onClick }) {
+function WindowSegment({ globalStyle, xStart, xEnd, thickness, roomHeight, color, isSelected, blueprintMode, wireframeMode, onClick }) {
+  const wColor = globalStyle === 'Traditional Indian' ? "#e6bca5" : (globalStyle === 'Royal/Heritage' ? "#fdfbf7" : color);
+  const wRough = globalStyle === 'Traditional Indian' ? 0.8 : (globalStyle === 'Royal/Heritage' ? 0.1 : 0.4);
+  const wMetal = globalStyle === 'Royal/Heritage' ? 0.3 : 0.1;
+  const fColor = globalStyle === 'Traditional Indian' ? "#5d4037" : (globalStyle === 'Royal/Heritage' ? "#b8860b" : "#ffffff");
+  const fRough = globalStyle === 'Royal/Heritage' ? 0.2 : 0.8;
+  const fMetal = globalStyle === 'Royal/Heritage' ? 0.8 : 0.1;
   const length = xEnd - xStart;
   if (length <= 0.001) return null;
 
@@ -206,14 +212,14 @@ function WindowSegment({ xStart, xEnd, thickness, roomHeight, color, isSelected,
       {/* 1. Sill Wall (Bottom) */}
       <mesh position={[length / 2, sillHeight / 2, thickness / 2]} castShadow receiveShadow>
         <boxGeometry args={[length, sillHeight, thickness]} />
-        <meshStandardMaterial color={color} roughness={0.4} transparent opacity={wireframeMode ? 0.3 : 1.0} wireframe={wireframeMode} />
+        <meshStandardMaterial color={wColor} roughness={wRough} metalness={wMetal} transparent opacity={wireframeMode ? 0.3 : 1.0} wireframe={wireframeMode} />
         <Edges scale={1} threshold={15} color={isSelected ? "#ec4899" : "#444455"} />
       </mesh>
 
       {/* 2. Header Wall (Top) */}
       <mesh position={[length / 2, windowTop + (roomHeight - windowTop) / 2, thickness / 2]} castShadow receiveShadow>
         <boxGeometry args={[length, roomHeight - windowTop, thickness]} />
-        <meshStandardMaterial color={color} roughness={0.4} transparent opacity={wireframeMode ? 0.3 : 1.0} wireframe={wireframeMode} />
+        <meshStandardMaterial color={wColor} roughness={wRough} metalness={wMetal} transparent opacity={wireframeMode ? 0.3 : 1.0} wireframe={wireframeMode} />
         <Edges scale={1} threshold={15} color={isSelected ? "#ec4899" : "#444455"} />
       </mesh>
 
@@ -231,22 +237,22 @@ function WindowSegment({ xStart, xEnd, thickness, roomHeight, color, isSelected,
           {/* Bottom frame border */}
           <mesh position={[0, -(windowTop - sillHeight) / 2 + frameThickness / 2, 0]}>
             <boxGeometry args={[length, frameThickness, thickness + 0.01]} />
-            <meshStandardMaterial color="#ffffff" roughness={0.2} />
+            <meshStandardMaterial color={fColor} roughness={fRough} metalness={fMetal} />
           </mesh>
           {/* Top frame border */}
           <mesh position={[0, (windowTop - sillHeight) / 2 - frameThickness / 2, 0]}>
             <boxGeometry args={[length, frameThickness, thickness + 0.01]} />
-            <meshStandardMaterial color="#ffffff" roughness={0.2} />
+            <meshStandardMaterial color={fColor} roughness={fRough} metalness={fMetal} />
           </mesh>
           {/* Left frame border */}
           <mesh position={[-length / 2 + frameThickness / 2, 0, 0]}>
             <boxGeometry args={[frameThickness, windowTop - sillHeight, thickness + 0.01]} />
-            <meshStandardMaterial color="#ffffff" roughness={0.2} />
+            <meshStandardMaterial color={fColor} roughness={fRough} metalness={fMetal} />
           </mesh>
           {/* Right frame border */}
           <mesh position={[length / 2 - frameThickness / 2, 0, 0]}>
             <boxGeometry args={[frameThickness, windowTop - sillHeight, thickness + 0.01]} />
-            <meshStandardMaterial color="#ffffff" roughness={0.2} />
+            <meshStandardMaterial color={fColor} roughness={fRough} metalness={fMetal} />
           </mesh>
         </group>
       )}
@@ -255,7 +261,13 @@ function WindowSegment({ xStart, xEnd, thickness, roomHeight, color, isSelected,
 }
 
 // 3. Door Segment with Open swing 3D wood and 2D swing arc
-function DoorSegment({ wallName, xStart, xEnd, thickness, roomHeight, color, isSelected, blueprintMode, wireframeMode, onClick }) {
+function DoorSegment({ globalStyle, wallName, xStart, xEnd, thickness, roomHeight, color, isSelected, blueprintMode, wireframeMode, onClick }) {
+  const fColor = globalStyle === 'Traditional Indian' ? "#3e2723" : (globalStyle === 'Royal/Heritage' ? "#b8860b" : "#8d6e63");
+  const fRough = globalStyle === 'Royal/Heritage' ? 0.2 : 0.6;
+  const fMetal = globalStyle === 'Royal/Heritage' ? 0.8 : 0.1;
+  const dColor = globalStyle === 'Traditional Indian' ? "#4e342e" : (globalStyle === 'Royal/Heritage' ? "#e5c100" : "#5d4037");
+  const dRough = globalStyle === 'Royal/Heritage' ? 0.3 : 0.8;
+  const dMetal = globalStyle === 'Royal/Heritage' ? 0.7 : 0.1;
   const length = xEnd - xStart;
   if (length <= 0.001) return null;
 
@@ -331,17 +343,17 @@ function DoorSegment({ wallName, xStart, xEnd, thickness, roomHeight, color, isS
       {/* Header Frame (Top horizontal bar) */}
       <mesh position={[length / 2, roomHeight - frameThickness / 2, thickness / 2]} castShadow>
         <boxGeometry args={[length, frameThickness, thickness + 0.01]} />
-        <meshStandardMaterial color="#8d6e63" roughness={0.6} />
+        <meshStandardMaterial color={fColor} roughness={fRough} metalness={fMetal} />
       </mesh>
       {/* Left Frame vertical bar */}
       <mesh position={[frameThickness / 2, roomHeight / 2, thickness / 2]} castShadow>
         <boxGeometry args={[frameThickness, roomHeight, thickness + 0.01]} />
-        <meshStandardMaterial color="#8d6e63" roughness={0.6} />
+        <meshStandardMaterial color={fColor} roughness={fRough} metalness={fMetal} />
       </mesh>
       {/* Right Frame vertical bar */}
       <mesh position={[length - frameThickness / 2, roomHeight / 2, thickness / 2]} castShadow>
         <boxGeometry args={[frameThickness, roomHeight, thickness + 0.01]} />
-        <meshStandardMaterial color="#8d6e63" roughness={0.6} />
+        <meshStandardMaterial color={fColor} roughness={fRough} metalness={fMetal} />
       </mesh>
 
       {/* Door panel itself (Hinged at left side frame, rotated 45 deg outwards) */}
@@ -349,7 +361,7 @@ function DoorSegment({ wallName, xStart, xEnd, thickness, roomHeight, color, isS
         <group position={[frameThickness, 0, thickness / 2]} rotation={[0, -Math.PI / 4, 0]}>
           <mesh position={[(length - frameThickness * 2) / 2, (roomHeight - frameThickness) / 2, 0]} castShadow>
             <boxGeometry args={[length - frameThickness * 2, roomHeight - frameThickness, 0.03]} />
-            <meshStandardMaterial color="#5d4037" roughness={0.8} />
+            <meshStandardMaterial color={dColor} roughness={dRough} metalness={dMetal} />
           </mesh>
         </group>
       )}
@@ -358,7 +370,7 @@ function DoorSegment({ wallName, xStart, xEnd, thickness, roomHeight, color, isS
 }
 
 // 4. Group Wall Assembler (coordinates outer, inner, and openings offsets)
-function ArchitecturalWall({ wallName, length, thickness, roomHeight, openings, color, isSelected, blueprintMode, wireframeMode, onClick, onAddOpening }) {
+function ArchitecturalWall({ globalStyle, wallName, length, thickness, roomHeight, openings, color, isSelected, blueprintMode, wireframeMode, onClick, onAddOpening }) {
   const wallOpenings = openings.filter(o => o.wall === wallName);
 
   const handleClick = (e) => {
@@ -1302,7 +1314,8 @@ function Room({
   onHover,
   placeMode,
   onAddOpening,
-  allRooms
+  allRooms,
+  globalStyle
 }) {
   if (blueprintMode) {
     return (
@@ -1390,8 +1403,9 @@ function Room({
           >
             <boxGeometry args={[width, 0.01, height]} />
             <meshStandardMaterial 
-              color={isWetRoom ? "#cfd8dc" : "#a1887f"} 
-              roughness={0.3} 
+              color={isWetRoom ? "#cfd8dc" : (globalStyle === 'Traditional Indian' ? "#8c564b" : (globalStyle === 'Royal/Heritage' ? "#fdfbf7" : "#a1887f"))} 
+              roughness={globalStyle === 'Royal/Heritage' ? 0.1 : 0.3} 
+              metalness={globalStyle === 'Royal/Heritage' ? 0.5 : 0.0} 
               transparent 
               opacity={wireframeMode ? 0.3 : 1.0}
             />
@@ -1406,6 +1420,7 @@ function Room({
           {/* 1. Back Wall: positioned along Z = 0, length = width */}
           <group position={[0, 0, 0]} rotation={[0, 0, 0]}>
             <ArchitecturalWall 
+              globalStyle={globalStyle}
               wallName="back" 
               length={width} 
               thickness={t} 
@@ -1423,6 +1438,7 @@ function Room({
           {/* 2. Front Wall: positioned along Z = height - t, length = width */}
           <group position={[0, 0, height - t]} rotation={[0, 0, 0]}>
             <ArchitecturalWall 
+              globalStyle={globalStyle}
               wallName="front" 
               length={width} 
               thickness={t} 
@@ -1440,6 +1456,7 @@ function Room({
           {/* 3. Left Wall: positioned along X = 0, between the front/back walls */}
           <group position={[0, 0, t]} rotation={[0, Math.PI / 2, 0]}>
             <ArchitecturalWall 
+              globalStyle={globalStyle}
               wallName="left" 
               length={height - 2 * t} 
               thickness={t} 
@@ -1457,6 +1474,7 @@ function Room({
           {/* 4. Right Wall: positioned along X = width - t, between front/back walls */}
           <group position={[width - t, 0, t]} rotation={[0, Math.PI / 2, 0]}>
             <ArchitecturalWall 
+              globalStyle={globalStyle}
               wallName="right" 
               length={height - 2 * t} 
               thickness={t} 
