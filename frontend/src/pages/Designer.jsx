@@ -102,20 +102,20 @@ export default function Designer() {
 
   const FALLBACK_LAYOUTS = {
     "1BHK": [
-      { id: "r1", name: "Living Room", width: 4.5, height: 4, x: 0, y: 0, color: "#ec4899", floor: 0 },
-      { id: "r2", name: "Kitchen", width: 3, height: 3, x: 4.5, y: 0, color: "#f97316", floor: 0 },
-      { id: "r3", name: "Pooja Corner", width: 3, height: 1.5, x: 4.5, y: 3, color: "#ffd700", floor: 0 },
-      { id: "r4", name: "Bedroom", width: 4.5, height: 4, x: 0, y: 4, color: "#b19cd9", floor: 0 },
-      { id: "r5", name: "Bathroom", width: 3, height: 2.5, x: 4.5, y: 4.5, color: "#4ecdc4", floor: 0 }
+      { id: "r1", name: "Living Room", width: 4, height: 4, x: 0, y: 0, color: "#FF6B35", floor: 0 },
+      { id: "r2", name: "Kitchen", width: 3, height: 2.5, x: 4, y: 0, color: "#F7C59F", floor: 0 },
+      { id: "r3", name: "Pooja Corner", width: 3, height: 1.5, x: 4, y: 2.5, color: "#FFD700", floor: 0 },
+      { id: "r4", name: "Bedroom", width: 4, height: 4, x: 0, y: 4, color: "#4ECDC4", floor: 0 },
+      { id: "r5", name: "Bathroom", width: 3, height: 4, x: 4, y: 4, color: "#A8DADC", floor: 0 }
     ],
     "2BHK": [
       { id: "r1", name: "Living Room", width: 5, height: 4.5, x: 0, y: 0, color: "#ffd700", floor: 0 },
       { id: "r2", name: "Kitchen", width: 3, height: 3.5, x: 5, y: 0, color: "#f97316", floor: 0 },
-      { id: "r3", name: "Master Bedroom", width: 4, height: 4, x: 0, y: 4.5, color: "#b19cd9", floor: 0 },
-      { id: "r4", name: "Guest Bedroom", width: 3.5, height: 4, x: 4, y: 4.5, color: "#45b7d1", floor: 0 },
-      { id: "r5", name: "Bathroom", width: 1.8, height: 2.2, x: 7.5, y: 4.5, color: "#4ecdc4", floor: 0 },
-      { id: "r6", name: "Pooja Room", width: 1.5, height: 1.0, x: 5, y: 3.5, color: "#ffd700", floor: 0 },
-      { id: "r7", name: "Balcony", width: 5, height: 1.5, x: 0, y: 8.5, color: "#a8dadc", floor: 0 }
+      { id: "r6", name: "Pooja Room", width: 3, height: 1.0, x: 5, y: 3.5, color: "#ffd700", floor: 0 },
+      { id: "r3", name: "Master Bedroom", width: 3.5, height: 4, x: 0, y: 4.5, color: "#b19cd9", floor: 0 },
+      { id: "r4", name: "Guest Bedroom", width: 3.0, height: 4, x: 3.5, y: 4.5, color: "#45b7d1", floor: 0 },
+      { id: "r5", name: "Bathroom", width: 1.5, height: 4, x: 6.5, y: 4.5, color: "#4ecdc4", floor: 0 },
+      { id: "r7", name: "Balcony", width: 8, height: 1.5, x: 0, y: 8.5, color: "#a8dadc", floor: 0 }
     ],
     "3BHK": [
       { id: "r1", name: "Living Room", width: 6, height: 6, x: 0, y: 0, color: "#FF6B35", floor: 0 },
@@ -128,7 +128,8 @@ export default function Designer() {
       { id: "r8", name: "Study Room", width: 2.5, height: 3, x: 2.5, y: 11, color: "#DDA0DD", floor: 0 },
       { id: "r9", name: "Master Bath", width: 3, height: 3, x: 5, y: 11, color: "#A8DADC", floor: 0 },
       { id: "r10", name: "Bathroom 2", width: 3, height: 3, x: 8, y: 11, color: "#A8DADC", floor: 0 },
-      { id: "r11", name: "Main Balcony", width: 6, height: 2, x: 0, y: 14, color: "#95E1D3", floor: 0 }
+      { id: "r11", name: "Bathroom 3", width: 3, height: 3, x: 11, y: 11, color: "#A8DADC", floor: 0 },
+      { id: "r12", name: "Main Balcony", width: 14, height: 2, x: 0, y: 14, color: "#95E1D3", floor: 0 }
     ],
     "Villa": [
       { id: "r1", name: "Grand Living Room", width: 8, height: 6, x: 0, y: 0, color: "#FF6B35", floor: 0 },
@@ -137,16 +138,13 @@ export default function Designer() {
       { id: "r4", name: "Pooja Room", width: 2, height: 6, x: 6, y: 6, color: "#FFD700", floor: 0 },
       { id: "r5", name: "Modular Kitchen", width: 6, height: 6, x: 8, y: 6, color: "#F7C59F", floor: 0 },
       { id: "r6", name: "Family Lounge", width: 7, height: 5, x: 0, y: 12, color: "#DDA0DD", floor: 0 },
-      { id: "r7", name: "Home Gym", width: 7, height: 5, x: 7, y: 12, color: "#98FB98", floor: 0 },
-      { id: "r8", name: "Bedroom 2", width: 5, height: 5, x: 0, y: 17, color: "#45B7D1", floor: 0 },
-      { id: "r9", name: "Bedroom 3", width: 5, height: 5, x: 5, y: 17, color: "#7EC8E3", floor: 0 },
-      { id: "r10", name: "Master Bath", width: 4, height: 3, x: 10, y: 17, color: "#A8DADC", floor: 0 }
+      { id: "r7", name: "Home Gym", width: 7, height: 5, x: 7, y: 12, color: "#98FB98", floor: 0 }
     ],
     "Studio": [
-      { id: "r1", name: "Studio Space", width: 6, height: 6, x: 0, y: 0, color: "#FF6B35", floor: 0 },
-      { id: "r2", name: "Kitchenette", width: 3, height: 3, x: 6, y: 0, color: "#F7C59F", floor: 0 },
-      { id: "r3", name: "Bathroom", width: 3, height: 3, x: 6, y: 3, color: "#A8DADC", floor: 0 },
-      { id: "r4", name: "Balcony", width: 6, height: 2, x: 0, y: 6, color: "#95E1D3", floor: 0 }
+      { id: "r1", name: "Studio Space", width: 5, height: 4, x: 0, y: 0, color: "#FF6B35", floor: 0 },
+      { id: "r2", name: "Kitchenette", width: 3, height: 4, x: 5, y: 0, color: "#F7C59F", floor: 0 },
+      { id: "r3", name: "Bathroom", width: 3, height: 2, x: 5, y: 4, color: "#A8DADC", floor: 0 },
+      { id: "r4", name: "Balcony", width: 5, height: 2, x: 0, y: 4, color: "#95E1D3", floor: 0 }
     ]
   };
 

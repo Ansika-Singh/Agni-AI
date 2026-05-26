@@ -9,11 +9,11 @@ const MOCK_FLOOR_PLAN = {
   rooms: [
     { id: "living", name: "Living Room", width: 5, height: 4.5, x: 0, y: 0, color: "#ffd700", furniture: ["Sofa", "TV Unit", "Coffee Table"] },
     { id: "kitchen", name: "Kitchen", width: 3, height: 3.5, x: 5, y: 0, color: "#f97316", furniture: ["Counter", "Fridge", "Stove"] },
-    { id: "master", name: "Master Bedroom", width: 4, height: 4, x: 0, y: 4.5, color: "#b19cd9", furniture: ["King Bed", "Wardrobe", "Dressing Table"] },
-    { id: "bedroom2", name: "Guest Bedroom", width: 3.5, height: 4, x: 4, y: 4.5, color: "#45b7d1", furniture: ["Double Bed", "Study Table"] },
-    { id: "bathroom", name: "Bathroom", width: 1.8, height: 2.2, x: 7.5, y: 4.5, color: "#4ecdc4", furniture: ["Toilet", "Shower"] },
-    { id: "pooja", name: "Pooja Room", width: 1.5, height: 1.0, x: 5, y: 3.5, color: "#ffd700", furniture: ["Altar", "Diya Stand"] },
-    { id: "balcony", name: "Balcony", width: 5, height: 1.5, x: 0, y: 8.5, color: "#a8dadc", furniture: ["Chair", "Plant"] }
+    { id: "pooja", name: "Pooja Room", width: 3, height: 1.0, x: 5, y: 3.5, color: "#ffd700", furniture: ["Altar", "Diya Stand"] },
+    { id: "master", name: "Master Bedroom", width: 3.5, height: 4, x: 0, y: 4.5, color: "#b19cd9", furniture: ["King Bed", "Wardrobe", "Dressing Table"] },
+    { id: "bedroom2", name: "Guest Bedroom", width: 3.0, height: 4, x: 3.5, y: 4.5, color: "#45b7d1", furniture: ["Double Bed", "Study Table"] },
+    { id: "bathroom", name: "Bathroom", width: 1.5, height: 4, x: 6.5, y: 4.5, color: "#4ecdc4", furniture: ["Toilet", "Shower"] },
+    { id: "balcony", name: "Balcony", width: 8, height: 1.5, x: 0, y: 8.5, color: "#a8dadc", furniture: ["Chair", "Plant"] }
   ]
 };
 
@@ -397,6 +397,12 @@ The layout must strictly adhere to classic Vastu Shastra rules:
 - Pooja Room: North-East (Water/Spiritual element).
 - Master Bedroom: South-West (Earth element).
 - Toilets / Bathrooms: West or North-West.
+
+STRICT RECTANGULAR BOUNDING BOX RULE (CRITICAL):
+- You MUST design the layout so that all rooms tessellate perfectly into a single, seamless rectangular outer bounding box. 
+- The sum of widths across any horizontal row must exactly equal the total width of the house.
+- The sum of heights across any vertical column must exactly equal the total height of the house.
+- There should be absolutely no jagged exterior boundaries, protruding rooms, or empty missing gaps in the floor plan. It must be a perfect puzzle.
 
 MULTI-STOREY / APARTMENT STRUCTURAL RULES:
 - Every room MUST include an integer "floor" attribute (default 0 for Ground Floor, 1 for 1st Floor, 2 for 2nd Floor, etc.).

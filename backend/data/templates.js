@@ -20,11 +20,11 @@ const templates = {
     rooms: [
       { id: "living", name: "Living Room", width: 5, height: 4.5, x: 0, y: 0, color: "#ffd700", furniture: ["Sofa", "TV Unit", "Coffee Table"] },
       { id: "kitchen", name: "Kitchen", width: 3, height: 3.5, x: 5, y: 0, color: "#f97316", furniture: ["Counter", "Fridge", "Stove"] },
-      { id: "master", name: "Master Bedroom", width: 4, height: 4, x: 0, y: 4.5, color: "#b19cd9", furniture: ["King Bed", "Wardrobe", "Dressing Table"] },
-      { id: "bedroom2", name: "Guest Bedroom", width: 3.5, height: 4, x: 4, y: 4.5, color: "#45b7d1", furniture: ["Double Bed", "Study Table"] },
-      { id: "bathroom", name: "Bathroom", width: 1.8, height: 2.2, x: 7.5, y: 4.5, color: "#4ecdc4", furniture: ["Toilet", "Shower"] },
-      { id: "pooja", name: "Pooja Room", width: 1.5, height: 1.0, x: 5, y: 3.5, color: "#ffd700", furniture: ["Altar", "Diya Stand"] },
-      { id: "balcony", name: "Balcony", width: 5, height: 1.5, x: 0, y: 8.5, color: "#a8dadc", furniture: ["Chair", "Plant"] }
+      { id: "pooja", name: "Pooja Room", width: 3, height: 1.0, x: 5, y: 3.5, color: "#ffd700", furniture: ["Altar", "Diya Stand"] },
+      { id: "master", name: "Master Bedroom", width: 3.5, height: 4, x: 0, y: 4.5, color: "#b19cd9", furniture: ["King Bed", "Wardrobe", "Dressing Table"] },
+      { id: "bedroom2", name: "Guest Bedroom", width: 3.0, height: 4, x: 3.5, y: 4.5, color: "#45b7d1", furniture: ["Double Bed", "Study Table"] },
+      { id: "bathroom", name: "Bathroom", width: 1.5, height: 4, x: 6.5, y: 4.5, color: "#4ecdc4", furniture: ["Toilet", "Shower"] },
+      { id: "balcony", name: "Balcony", width: 8, height: 1.5, x: 0, y: 8.5, color: "#a8dadc", furniture: ["Chair", "Plant"] }
     ]
   },
   '3BHK': {
@@ -44,8 +44,7 @@ const templates = {
       { id: "bathroom1", name: "Master Bath", width: 3, height: 3, x: 5, y: 11, color: "#A8DADC", furniture: ["Bathtub", "Shower", "Sink"] },
       { id: "bathroom2", name: "Bathroom 2", width: 3, height: 3, x: 8, y: 11, color: "#A8DADC", furniture: ["Toilet", "Shower"] },
       { id: "bathroom3", name: "Bathroom 3", width: 3, height: 3, x: 11, y: 11, color: "#A8DADC", furniture: ["Toilet"] },
-      { id: "balcony1", name: "Main Balcony", width: 6, height: 2, x: 0, y: 14, color: "#95E1D3", furniture: ["Swing", "Plants"] },
-      { id: "balcony2", name: "Bedroom Balcony", width: 4, height: 2, x: 6, y: 14, color: "#95E1D3", furniture: ["Chair"] }
+      { id: "balcony1", name: "Main Balcony", width: 14, height: 2, x: 0, y: 14, color: "#95E1D3", furniture: ["Swing", "Plants"] }
     ]
   },
   'Villa': {
@@ -69,10 +68,10 @@ const templates = {
     style: "Minimalist",
     vastuScore: 70,
     rooms: [
-      { id: "main", name: "Studio Space", width: 6, height: 6, x: 0, y: 0, color: "#FF6B35", furniture: ["Murphy Bed", "Mini Sofa", "Compact TV"] },
-      { id: "kitchen", name: "Kitchenette", width: 3, height: 3, x: 6, y: 0, color: "#F7C59F", furniture: ["Counter", "Mini Fridge"] },
-      { id: "bathroom", name: "Bathroom", width: 3, height: 3, x: 6, y: 3, color: "#A8DADC", furniture: ["Shower", "Toilet", "Sink"] },
-      { id: "balcony", name: "Balcony", width: 6, height: 2, x: 0, y: 6, color: "#95E1D3", furniture: ["Chair"] }
+      { id: "main", name: "Studio Space", width: 5, height: 4, x: 0, y: 0, color: "#FF6B35", furniture: ["Murphy Bed", "Mini Sofa", "Compact TV"] },
+      { id: "kitchen", name: "Kitchenette", width: 3, height: 4, x: 5, y: 0, color: "#F7C59F", furniture: ["Counter", "Mini Fridge"] },
+      { id: "bathroom", name: "Bathroom", width: 3, height: 2, x: 5, y: 4, color: "#A8DADC", furniture: ["Shower", "Toilet", "Sink"] },
+      { id: "balcony", name: "Balcony", width: 5, height: 2, x: 0, y: 4, color: "#95E1D3", furniture: ["Chair"] }
     ]
   }
 };
