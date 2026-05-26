@@ -478,6 +478,63 @@ Ensure all room boundaries are logical (e.g. Master Bedroom is at least 4x4, Poo
       throw new Error('Invalid Floor Plan JSON schema from Gemini: missing rooms array');
     }
     
+    // --- BEGIN PROCEDURAL STACKING FOR LLM HALLUCINATIONS ---
+    let floorsCount = 1;
+    if (preferences.storeys) {
+      if (preferences.storeys.includes("2 Storeys")) floorsCount = 2;
+      else if (preferences.storeys.includes("3 Storeys")) floorsCount = 3;
+    }
+
+    // Ensure all LLM rooms have at least a floor 0 property
+    parsed.rooms.forEach(r => { r.floor = r.floor || 0; });
+
+    // Check if LLM successfully generated upper floors
+    const hasUpperFloors = parsed.rooms.some(r => r.floor > 0);
+
+    if (floorsCount > 1 && !hasUpperFloors) {
+      // LLM failed to understand 3D stacking. Procedurally clone the ground floor to create upper floors.
+      const groundRooms = JSON.parse(JSON.stringify(parsed.rooms.filter(r => r.floor === 0)));
+      
+      // Inject staircase into ground floor if missing
+      let staircase = parsed.rooms.find(r => r.id && r.id.toLowerCase().includes('stair'));
+      if (!staircase && groundRooms.length > 0) {
+        staircase = {
+          id: "staircase",
+          name: "Staircase",
+          width: 3.0,
+          height: 3.0,
+          x: 0,
+          y: 0,
+          floor: 0,
+          color: "#708090",
+          furniture: ["Concrete Steps"]
+        };
+        // shift other rooms to make space
+        parsed.rooms.forEach(r => {
+          if (r.x < 3.0 && r.y < 3.0) r.x += 3.0;
+        });
+        groundRooms.forEach(r => {
+          if (r.x < 3.0 && r.y < 3.0) r.x += 3.0;
+        });
+        parsed.rooms.unshift(staircase);
+        groundRooms.unshift(staircase);
+      }
+
+      // Generate upper floors
+      for (let f = 1; f < floorsCount; f++) {
+        const upperRooms = JSON.parse(JSON.stringify(groundRooms));
+        upperRooms.forEach(r => {
+          r.floor = f;
+          r.id = `${r.id}_L${f}`;
+          if (r.name && !r.name.includes("Staircase")) {
+            r.name = `${r.name} (L${f})`;
+          }
+        });
+        parsed.rooms.push(...upperRooms);
+      }
+    }
+    // --- END PROCEDURAL STACKING ---
+    
     parsed.rooms = resolveOverlaps(parsed.rooms);
     return parsed;
   } catch (err) {
