@@ -1434,16 +1434,8 @@ function Room({
             const segLength = xEnd - xStart;
             if (segLength <= 0.05) return null;
 
-            // De-duplicate shared walls in 3D: only render on the room with smaller id
-            if (seg.isShared) {
-              const other = allRooms?.find(o => 
-                o.id !== data.id &&
-                (o.floor || 0) === floor &&
-                Math.abs((o.y + (o.height || o.h)) - y) < 0.1 &&
-                Math.max(x, o.x) < Math.min(x + width, o.x + (o.width || o.w)) - 0.1
-              );
-              if (other && data.id > other.id) return null;
-            }
+            // Render all wall segments to prevent gaps and jagged edges
+            // (Rooms will render adjacent inner walls forming a clean union)
 
             return (
               <group key={`back-seg-${idx}`} position={[xStart, 0, 0]} rotation={[0, 0, 0]}>
@@ -1473,16 +1465,8 @@ function Room({
             const segLength = xEnd - xStart;
             if (segLength <= 0.05) return null;
 
-            // De-duplicate shared walls in 3D: only render on the room with smaller id
-            if (seg.isShared) {
-              const other = allRooms?.find(o => 
-                o.id !== data.id &&
-                (o.floor || 0) === floor &&
-                Math.abs(o.y - (y + height)) < 0.1 &&
-                Math.max(x, o.x) < Math.min(x + width, o.x + (o.width || o.w)) - 0.1
-              );
-              if (other && data.id > other.id) return null;
-            }
+            // Render all wall segments to prevent gaps and jagged edges
+            // (Rooms will render adjacent inner walls forming a clean union)
 
             return (
               <group key={`front-seg-${idx}`} position={[xStart, 0, height - t]} rotation={[0, 0, 0]}>
@@ -1512,16 +1496,8 @@ function Room({
             const segLength = zEnd - zStart;
             if (segLength <= 0.05) return null;
 
-            // De-duplicate shared walls in 3D: only render on the room with smaller id
-            if (seg.isShared) {
-              const other = allRooms?.find(o => 
-                o.id !== data.id &&
-                (o.floor || 0) === floor &&
-                Math.abs((o.x + (o.width || o.w)) - x) < 0.1 &&
-                Math.max(y, o.y) < Math.min(y + height, o.y + (o.height || o.h)) - 0.1
-              );
-              if (other && data.id > other.id) return null;
-            }
+            // Render all wall segments to prevent gaps and jagged edges
+            // (Rooms will render adjacent inner walls forming a clean union)
 
             return (
               <group key={`left-seg-${idx}`} position={[t, 0, zStart]} rotation={[0, -Math.PI / 2, 0]}>
@@ -1551,16 +1527,8 @@ function Room({
             const segLength = zEnd - zStart;
             if (segLength <= 0.05) return null;
 
-            // De-duplicate shared walls in 3D: only render on the room with smaller id
-            if (seg.isShared) {
-              const other = allRooms?.find(o => 
-                o.id !== data.id &&
-                (o.floor || 0) === floor &&
-                Math.abs(o.x - (x + width)) < 0.1 &&
-                Math.max(y, o.y) < Math.min(y + height, o.y + (o.height || o.h)) - 0.1
-              );
-              if (other && data.id > other.id) return null;
-            }
+            // Render all wall segments to prevent gaps and jagged edges
+            // (Rooms will render adjacent inner walls forming a clean union)
 
             return (
               <group key={`right-seg-${idx}`} position={[width, 0, zStart]} rotation={[0, -Math.PI / 2, 0]}>

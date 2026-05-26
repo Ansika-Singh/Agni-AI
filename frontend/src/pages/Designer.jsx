@@ -439,6 +439,8 @@ export default function Designer() {
 
       rec.onstart = () => {
         setChatMicOn(true);
+        setShowChatDrawer(true);
+        setShowInspector(false);
       };
 
       rec.onresult = (e) => {
@@ -2177,7 +2179,7 @@ export default function Designer() {
              zIndex: 20,
              display: 'flex',
              flexDirection: 'column',
-             right: showChatDrawer ? '0' : '-360px',
+             right: showChatDrawer ? (showInspector ? '340px' : '0') : '-360px',
              width: '340px',
              background: 'rgba(10, 11, 18, 0.92)',
              backdropFilter: 'blur(25px)',
