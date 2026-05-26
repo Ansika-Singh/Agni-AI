@@ -255,7 +255,7 @@ async function generateFloorPlan(description, preferences = {}, forceHybrid = fa
               width: ci.w,
               height: ci.h,
               x: 0,
-              y: 5,
+              y: 10,
               floor: 0,
               color: ci.color,
               furniture: ci.items

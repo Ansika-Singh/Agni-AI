@@ -619,7 +619,8 @@ function BlueprintRoom({
   unit,
   onHover,
   placeMode,
-  onAddOpening
+  onAddOpening,
+  globalOpenings
 }) {
   const w = data.width || data.w || 0;
   const h = data.height || data.h || 0;
@@ -631,11 +632,13 @@ function BlueprintRoom({
   const walls = useMemo(() => getWallSegmentsForRoom(data, allRooms || []), [data, allRooms]);
 
   const openings = useMemo(() => {
-    return data.openings || [
+    if (data.openings) return data.openings;
+    if (globalOpenings && globalOpenings[data.id]) return globalOpenings[data.id];
+    return [
       { type: 'door', wall: 'front', offset: 0.5, width: 0.9 },
       { type: 'window', wall: 'back', offset: Math.max(0.5, w / 2 - 0.6), width: Math.min(w - 1.0, 1.2) }
     ];
-  }, [data.openings, w]);
+  }, [data.openings, data.id, globalOpenings, w]);
 
   const formattedDimensions = unit === 'ft'
     ? `${(w * 3.28084).toFixed(1)}' × ${(h * 3.28084).toFixed(1)}'`
@@ -1489,6 +1492,7 @@ function Room({
         onHover={onHover}
         placeMode={placeMode}
         onAddOpening={onAddOpening}
+        globalOpenings={globalOpenings}
       />
     );
   }
