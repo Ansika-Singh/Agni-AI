@@ -132,9 +132,9 @@ function hashCode(str) {
   return hash;
 }
 
-async function generateFloorPlan(description, preferences = {}) {
-  if (!process.env.GEMINI_API_KEY) {
-    console.log('🔧 Hybrid Mode: No GEMINI_API_KEY found. Serving dynamically customized template fallback with procedural variety and vertical stacking.');
+async function generateFloorPlan(description, preferences = {}, forceHybrid = false) {
+  if (!process.env.GEMINI_API_KEY || forceHybrid) {
+    console.log('🔧 Hybrid Mode: Serving dynamically customized template fallback with procedural variety and vertical stacking.');
     const templates = require('../data/templates');
     const homeType = preferences.homeType || '2BHK';
     
@@ -540,20 +540,8 @@ Ensure all room boundaries are logical (e.g. Master Bedroom is at least 4x4, Poo
     return parsed;
   } catch (err) {
     console.error('Gemini Floor Plan Generation Error:', err.message);
-    // Use the correct template for the requested homeType instead of always defaulting to 2BHK
-    const templates = require('../data/templates');
-    const homeType = preferences.homeType || '2BHK';
-    const fallbackTemplate = templates[homeType] || templates['2BHK'];
-    const fallbackRooms = JSON.parse(JSON.stringify(fallbackTemplate.rooms));
-    fallbackRooms.forEach(r => { r.floor = r.floor || 0; });
-    return {
-      title: fallbackTemplate.title,
-      totalArea: fallbackTemplate.totalArea,
-      style: preferences.style || fallbackTemplate.style,
-      vastuScore: fallbackTemplate.vastuScore,
-      rooms: resolveOverlaps(fallbackRooms),
-      description
-    };
+    // Quota exceeded or network error, fallback to hybrid generator
+    return generateFloorPlan(description, preferences, true);
   }
 }
 
