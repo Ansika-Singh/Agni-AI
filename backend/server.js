@@ -5,12 +5,7 @@ const mongoose = require('mongoose');
 
 const app = express();
 
-// Secure CORS: Allow frontend URL or localhost
-const allowedOrigins = [
-  'http://localhost:3000',
-  process.env.FRONTEND_URL || 'http://localhost:3000'
-];
-app.use(cors({ origin: allowedOrigins }));
+app.use(cors()); // Allow all origins for local testing
 
 // Protect against massive JSON payloads
 app.use(express.json({ limit: '2mb' }));

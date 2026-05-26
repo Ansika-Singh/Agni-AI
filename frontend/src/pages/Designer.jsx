@@ -22,6 +22,17 @@ export default function Designer() {
   const [showVastuOverlay, setShowVastuOverlay] = useState(false);
   const [resetCounter, setResetCounter] = useState(0);
   const [showInspector, setShowInspector] = useState(false);
+  useEffect(() => {
+    // Check backend health on mount
+    fetch(`${import.meta.env.VITE_BACKEND_URL}/api/health`)
+      .then(res => res.json())
+      .then(data => console.log("Backend Health:", data))
+      .catch(err => {
+        console.error("Backend Health Check Failed:", err);
+        showToast(`Backend Unreachable: ${err.message}`, 'error');
+      });
+  }, []);
+
   const [activeFloor, setActiveFloor] = useState('all');
   const [toastMessage, setToastMessage] = useState('');
 
@@ -155,10 +166,25 @@ export default function Designer() {
 
     try {
       const bodyPayload = preferences.isAI 
-        ? { description: preferences.description } 
+        ? {
+            description: preferences.description,
+            preferences: {
+              storeys: preferences.storeys,
+              homeType: preferences.homeType,
+              style: preferences.style,
+              budget: preferences.budget,
+              vastu: preferences.vastu,
+              facing: preferences.facing,
+              colorPalette: preferences.colorPalette,
+              flooring: preferences.flooring,
+              kitchenStyle: preferences.kitchenStyle,
+              specialRequirements: preferences.specialRequirements,
+            }
+          }
         : { preferences };
 
-      const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/floorplan/generate`, {
+      const backendUrl = import.meta.env.VITE_BACKEND_URL || `http://${window.location.hostname}:5000`;
+      const response = await fetch(`${backendUrl}/api/floorplan/generate`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(bodyPayload)
@@ -168,6 +194,9 @@ export default function Designer() {
       if (data.success) {
         data.floorPlan.landArea = preferences.landArea;
         data.floorPlan.homeType = preferences.homeType;
+        console.log('Received floorPlan from backend with rooms:', data.floorPlan.rooms.length);
+        const floors = [...new Set(data.floorPlan.rooms.map(r => r.floor || 0))];
+        console.log('Extracted floors from rooms:', floors);
         setFloorPlan(data.floorPlan);
         setActiveFloor('all');
         fetchVastu(data.floorPlan.rooms);
@@ -191,6 +220,7 @@ export default function Designer() {
         landArea: preferences.landArea,
         homeType: preferences.homeType
       };
+      showToast(`Offline Mode - Error: ${err.message}`);
       setFloorPlan(fallbackPlan);
       setActiveFloor('all');
       showToast('Offline Mode: Loaded Preset Layout');

@@ -12,6 +12,8 @@ router.post('/generate', async (req, res) => {
 
     const prompt = description || buildPromptFromPreferences(preferences);
     const floorPlan = await generateFloorPlan(prompt, preferences);
+    const floors = [...new Set(floorPlan.rooms.map(r => r.floor || 0))];
+    console.log(`[API /generate] Returning ${floorPlan.rooms.length} rooms across floors: ${floors.join(', ')}`);
     res.json({ success: true, floorPlan });
   } catch (err) {
     console.error('Floor plan error:', err);
