@@ -33,6 +33,25 @@ function HighFiWindow({ width, height, position, rotation = [0,0,0] }) {
   );
 }
 
+// A realistic modern door
+function HighFiDoor({ width, height, position, rotation = [0,0,0] }) {
+  const frameThick = 0.08;
+  return (
+    <group position={position} rotation={rotation}>
+      {/* Outer Frame */}
+      <mesh position={[0, 0, 0]}>
+        <boxGeometry args={[width, height, 0.1]} />
+        <meshStandardMaterial color="#f8f9fa" roughness={0.3} />
+      </mesh>
+      {/* Wood Door slab - slightly recessed */}
+      <mesh position={[0, -frameThick/2, 0.02]}>
+        <boxGeometry args={[width - frameThick*2, height - frameThick, 0.08]} />
+        <meshStandardMaterial color="#4e342e" roughness={0.7} metalness={0.1} />
+      </mesh>
+    </group>
+  );
+}
+
 // Glass Railing with steel top rail
 function GlassRailing({ width, depth, position }) {
   const height = 1.0;
@@ -198,26 +217,52 @@ function HouseExterior({ rooms, style, homeType }) {
               </mesh>
             )}
 
-            {/* 5. Windows (Only on non-slat, non-balcony, front/side faces) */}
-            {!isBalcony && !hasSlats && !isStairs && (
+            {/* 5. Windows & Doors (using room.openings or defaults) */}
+            {!isBalcony && !isStairs && (
               <group>
-                {/* Front window */}
-                {d > 2.5 && (
-                  <HighFiWindow 
-                    width={w * 0.5} 
-                    height={wallH * 0.6} 
-                    position={[rx, ry + 0.2, rz + d/2 + 0.01]} 
-                  />
-                )}
-                {/* Side window (optional based on width) */}
-                {w > 3.5 && (
-                  <HighFiWindow 
-                    width={d * 0.4} 
-                    height={wallH * 0.6} 
-                    position={[rx + w/2 + 0.01, ry + 0.2, rz]} 
-                    rotation={[0, Math.PI/2, 0]}
-                  />
-                )}
+                {(() => {
+                  let ops = room.openings && room.openings.length > 0 ? room.openings : null;
+                  if (!ops) {
+                    ops = [];
+                    // Add default main door on ground floor living room
+                    if (floorIdx === 0 && (room.name?.toLowerCase().includes('living') || room.name?.toLowerCase().includes('hall'))) {
+                      ops.push({ type: 'door', wall: 'front', offset: w/2 - 0.45, width: 0.9 });
+                    }
+                    if (!hasSlats && d > 2.5) ops.push({ type: 'window', wall: 'front', offset: w/2 - (w*0.5)/2, width: w * 0.5 });
+                    if (!hasSlats && w > 3.5) ops.push({ type: 'window', wall: 'right', offset: d/2 - (d*0.4)/2, width: d * 0.4 });
+                  }
+                  
+                  return ops.map((op, idx) => {
+                    const opW = op.width;
+                    let posX = 0, posZ = 0, rot = [0,0,0];
+                    if (op.wall === 'front') {
+                      posX = room.x + op.offset + opW / 2;
+                      posZ = rz + d / 2 + 0.01;
+                    } else if (op.wall === 'back') {
+                      posX = room.x + op.offset + opW / 2;
+                      posZ = rz - d / 2 - 0.01;
+                      rot = [0, Math.PI, 0];
+                    } else if (op.wall === 'left') {
+                      posX = rx - w / 2 - 0.01;
+                      posZ = room.y + op.offset + opW / 2;
+                      rot = [0, -Math.PI / 2, 0];
+                    } else if (op.wall === 'right') {
+                      posX = rx + w / 2 + 0.01;
+                      posZ = room.y + op.offset + opW / 2;
+                      rot = [0, Math.PI / 2, 0];
+                    }
+
+                    if (op.type === 'door') {
+                      const doorH = 2.2;
+                      const posY = baseY + doorH / 2;
+                      return <HighFiDoor key={idx} width={opW} height={doorH} position={[posX, posY, posZ]} rotation={rot} />;
+                    } else {
+                      const winH = wallH * 0.6;
+                      const posY = baseY + 1.0 + winH / 2; // sill height ~1.0m
+                      return <HighFiWindow key={idx} width={opW} height={winH} position={[posX, posY, posZ]} rotation={rot} />;
+                    }
+                  });
+                })()}
               </group>
             )}
 
