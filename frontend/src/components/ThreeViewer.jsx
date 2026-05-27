@@ -1311,7 +1311,7 @@ function BlueprintRoom({
 // Pre-computes openings for ALL rooms at once so that shared walls get
 // matching holes on both sides, eliminating ghost gaps / blocked doorways.
 // ============================================================================
-function generateGlobalOpenings(allRooms) {
+export function generateGlobalOpenings(allRooms) {
   if (!allRooms || allRooms.length === 0) return {};
 
   const result = {}; // { roomId: [ {type, wall, offset, width}, ... ] }

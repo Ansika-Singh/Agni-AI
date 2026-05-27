@@ -2,6 +2,7 @@ import { useState, useRef, useMemo, useEffect } from 'react';
 import { Canvas, useThree, useFrame } from '@react-three/fiber';
 import { OrbitControls, Sky, Html } from '@react-three/drei';
 import * as THREE from 'three';
+import { generateGlobalOpenings } from './ThreeViewer';
 
 // ─── HIGH-FIDELITY ARCHITECTURAL COMPONENTS ──────────────────────────────────
 
@@ -147,6 +148,8 @@ function HouseExterior({ rooms, style, homeType }) {
   
   if (!rooms || rooms.length === 0) return null;
 
+  const globalOpenings = useMemo(() => generateGlobalOpenings(rooms), [rooms]);
+
   // Center the house geometry
   const allX = rooms.flatMap(r => [r.x, r.x + (r.width || r.w || 3)]);
   const allZ = rooms.flatMap(r => [r.y, r.y + (r.height || r.h || 3)]);
@@ -223,13 +226,7 @@ function HouseExterior({ rooms, style, homeType }) {
                 {(() => {
                   let ops = room.openings && room.openings.length > 0 ? room.openings : null;
                   if (!ops) {
-                    ops = [];
-                    // Add default main door on ground floor living room
-                    if (floorIdx === 0 && (room.name?.toLowerCase().includes('living') || room.name?.toLowerCase().includes('hall'))) {
-                      ops.push({ type: 'door', wall: 'front', offset: w/2 - 0.45, width: 0.9 });
-                    }
-                    if (!hasSlats && d > 2.5) ops.push({ type: 'window', wall: 'front', offset: w/2 - (w*0.5)/2, width: w * 0.5 });
-                    if (!hasSlats && w > 3.5) ops.push({ type: 'window', wall: 'right', offset: d/2 - (d*0.4)/2, width: d * 0.4 });
+                    ops = globalOpenings[room.id] || [];
                   }
                   
                   return ops.map((op, idx) => {
