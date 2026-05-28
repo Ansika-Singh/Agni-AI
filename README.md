@@ -1,5 +1,7 @@
 # 🔥 Agni AI - Intelligent Architecture & Vastu Assistant
 
+**🚀 [Try the Live Demo!](https://agni-ai-pi.vercel.app)**
+
 Agni AI is a next-generation, fully interactive 3D architectural visualization and interior design application. Built specifically to bridge the gap between modern architectural design and traditional Indian Vastu principles, it empowers users to instantly generate fully-furnished 2D floor plans, explore beautiful real-time 3D environments, and converse with a specialized AI architect to validate their designs.
 
 ## ✨ Core Features & Technical Details
