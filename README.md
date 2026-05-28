@@ -1,5 +1,3 @@
-![Agni AI Hero Banner](./frontend/public/agni_hero.png)
-
 # 🔥 Agni AI - Intelligent Architecture & Vastu Assistant
 
 **🚀 [Try the Live Demo!](https://agni-ai-pi.vercel.app)**
