@@ -6,6 +6,14 @@
 
 Agni AI is a next-generation, fully interactive 3D architectural visualization and interior design application. Built specifically to bridge the gap between modern architectural design and traditional Indian Vastu principles, it empowers users to instantly generate fully-furnished 2D floor plans, explore beautiful real-time 3D environments, and converse with a specialized AI architect to validate their designs.
 
+## 📸 Interface Screenshots
+
+Here is a glimpse of Agni AI generating fully-furnished multi-bedroom floor plans and beautiful 3D exteriors.
+
+| 2BHK Layout Generation | 3BHK Layout Generation |
+| :---: | :---: |
+| ![2BHK Layout](./frontend/public/preset_2bhk.png) | ![3BHK Layout](./frontend/public/preset_3bhk.png) |
+
 ## ✨ Core Features & Technical Details
 
 ### 🤖 Agni Voicebot Assistant
