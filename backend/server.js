@@ -7,6 +7,13 @@ const app = express();
 
 app.use(cors()); // Allow all origins for local testing
 
+// Security Headers
+app.use((req, res, next) => {
+  res.setHeader("Content-Security-Policy", "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self' https:;");
+  res.setHeader("X-Frame-Options", "DENY");
+  next();
+});
+
 // Protect against massive JSON payloads
 app.use(express.json({ limit: '2mb' }));
 
