@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next';
 export default function Header() {
   const { t, i18n } = useTranslation();
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const dropdownRef = useRef(null);
 
   const languages = [
@@ -32,13 +33,14 @@ export default function Header() {
   }, []);
 
   return (
-    <header className="nav" style={{ borderBottom: '1px solid var(--color-border-subtle)' }}>
-      <div className="container flex items-center justify-between relative">
-        <Link to="/" className="flex items-center gap-1" style={{ textDecoration: 'none' }}>
+    <header className="nav" style={{ borderBottom: '1px solid var(--color-border-subtle)', position: 'relative', zIndex: 100 }}>
+      <div className="container flex items-center justify-between relative" style={{ minHeight: '64px' }}>
+        <Link to="/" className="flex items-center gap-1" style={{ textDecoration: 'none' }} onClick={() => setMobileMenuOpen(false)}>
           <div className="text-fire" style={{ fontSize: '1.5rem' }}>🔥</div>
           <div className="font-bold text-xl">Agni <span className="text-white">AI</span></div>
         </Link>
         
+        {/* Desktop Nav */}
         <nav className="flex gap-4 hide-mobile items-center justify-center absolute w-full pointer-events-none" style={{ left: 0 }}>
           <Link to="/" className="text-sm font-semibold pointer-events-auto" style={{ color: 'var(--color-text-secondary)', textDecoration: 'none' }}>{t('nav.home')}</Link>
           <Link to="/designer" className="text-sm font-bold pointer-events-auto" style={{ color: 'var(--color-text)', textDecoration: 'none' }}>{t('nav.designer')}</Link>
@@ -98,9 +100,98 @@ export default function Header() {
             )}
           </div>
           
-          <button className="btn btn-sm" style={{ border: '1px solid var(--color-border-subtle)', background: 'transparent', color: 'white' }}>{t('nav.signIn')}</button>
+          <button className="btn btn-sm hide-mobile" style={{ border: '1px solid var(--color-border-subtle)', background: 'transparent', color: 'white' }}>{t('nav.signIn')}</button>
+
+          {/* Mobile Hamburger Toggle Button */}
+          <button
+            className="btn btn-sm hide-desktop"
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            style={{
+              padding: '6px 10px',
+              background: 'var(--color-surface-2)',
+              border: '1px solid var(--color-border-subtle)',
+              color: 'white',
+              fontSize: '1.1rem',
+              cursor: 'pointer',
+              borderRadius: '8px'
+            }}
+            aria-label="Toggle Navigation Menu"
+          >
+            {mobileMenuOpen ? '✕' : '☰'}
+          </button>
         </div>
       </div>
+
+      {/* Mobile Drawer Menu */}
+      {mobileMenuOpen && (
+        <div 
+          className="hide-desktop"
+          style={{
+            position: 'absolute',
+            top: '100%',
+            left: 0,
+            right: 0,
+            background: 'rgba(10, 11, 18, 0.98)',
+            backdropFilter: 'blur(20px)',
+            borderBottom: '1px solid var(--color-border)',
+            boxShadow: '0 15px 30px rgba(0,0,0,0.8)',
+            padding: '1.25rem 1.5rem',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '1rem',
+            zIndex: 99
+          }}
+        >
+          <Link 
+            to="/" 
+            onClick={() => setMobileMenuOpen(false)}
+            style={{
+              color: 'var(--color-text)',
+              textDecoration: 'none',
+              fontSize: '1rem',
+              fontWeight: 600,
+              padding: '8px 0',
+              borderBottom: '1px solid rgba(255,255,255,0.05)'
+            }}
+          >
+            🏠 {t('nav.home')}
+          </Link>
+          <Link 
+            to="/designer" 
+            onClick={() => setMobileMenuOpen(false)}
+            style={{
+              color: 'var(--color-fire-1)',
+              textDecoration: 'none',
+              fontSize: '1rem',
+              fontWeight: 700,
+              padding: '8px 0',
+              borderBottom: '1px solid rgba(255,255,255,0.05)'
+            }}
+          >
+            📐 {t('nav.designer')}
+          </Link>
+          <Link 
+            to="/designs" 
+            onClick={() => setMobileMenuOpen(false)}
+            style={{
+              color: 'var(--color-text)',
+              textDecoration: 'none',
+              fontSize: '1rem',
+              fontWeight: 600,
+              padding: '8px 0',
+              borderBottom: '1px solid rgba(255,255,255,0.05)'
+            }}
+          >
+            📁 {t('nav.myDesigns')}
+          </Link>
+          <div style={{ paddingTop: '8px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <span style={{ fontSize: '0.85rem', color: 'var(--color-text-secondary)' }}>Account</span>
+            <button className="btn btn-sm btn-primary" style={{ padding: '6px 18px', fontSize: '0.85rem' }}>
+              {t('nav.signIn')}
+            </button>
+          </div>
+        </div>
+      )}
     </header>
   );
 }

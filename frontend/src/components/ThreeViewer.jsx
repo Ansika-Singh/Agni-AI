@@ -2699,8 +2699,8 @@ export default function ThreeViewer({
       {blueprintMode && (
         <div style={{
           position: 'absolute',
-          bottom: '2.5rem',
-          right: '2.5rem',
+          bottom: '1rem',
+          right: '1rem',
           background: 'rgba(10, 26, 48, 0.85)',
           border: '1px solid #4ecdc4',
           borderRadius: '8px',

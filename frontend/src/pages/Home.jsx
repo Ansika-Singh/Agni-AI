@@ -225,6 +225,7 @@ export default function Home() {
   const [isGenerating, setIsGenerating] = useState(false);
   const [logs, setLogs] = useState([]);
   const [drawProgress, setDrawProgress] = useState(0);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const preset = PRESETS[selectedKey];
 
@@ -310,7 +311,7 @@ export default function Home() {
       <div className="hero-full-bg" />
 
       {/* Behance White Capsule Navbar */}
-      <header className="animate-header-entry" style={{
+      <header className="animate-header-entry home-capsule-nav" style={{
         maxWidth: '1150px',
         width: '92%',
         margin: '24px auto 0 auto',
@@ -321,7 +322,7 @@ export default function Home() {
         justifyContent: 'space-between',
         alignItems: 'center',
         boxShadow: '0 15px 40px rgba(0, 0, 0, 0.6)',
-        zIndex: 10,
+        zIndex: 50,
         position: 'relative'
       }}>
         {/* Left Side: Purple Logo Icon & Brand Name */}
@@ -341,8 +342,8 @@ export default function Home() {
           }}>Agni AI</span>
         </div>
 
-        {/* Center: Navigation Links */}
-        <nav style={{ display: 'flex', alignItems: 'center', gap: '24px' }}>
+        {/* Center: Navigation Links (desktop) */}
+        <nav className="hide-mobile" style={{ display: 'flex', alignItems: 'center', gap: '24px' }}>
           {['Product', 'Pricing', 'About'].map((link) => (
             <a key={link} href={`#${link.toLowerCase()}`} style={{
               color: '#4b5563',
@@ -359,27 +360,107 @@ export default function Home() {
           ))}
         </nav>
 
-        {/* Right Side: Black Explore Pill Button */}
-        <div>
+        {/* Right Side: Black Explore Pill Button & Mobile Toggle */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
           <Link to="/designer" style={{
             background: '#000000',
             color: '#ffffff',
             borderRadius: '50px',
-            padding: '10px 24px',
+            padding: '8px 20px',
             fontSize: '0.85rem',
             fontWeight: 700,
             textDecoration: 'none',
             display: 'inline-block',
             boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
-            transition: 'background 0.2s'
+            transition: 'background 0.2s',
+            whiteSpace: 'nowrap'
           }}
           onMouseOver={(e) => e.target.style.background = '#222222'}
           onMouseOut={(e) => e.target.style.background = '#000000'}
           >
             Explore
           </Link>
+
+          {/* Mobile Hamburger Button */}
+          <button
+            className="hide-desktop"
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            style={{
+              background: '#f3f4f6',
+              border: 'none',
+              borderRadius: '50%',
+              width: '36px',
+              height: '36px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              cursor: 'pointer',
+              color: '#111111',
+              fontSize: '1.1rem',
+              fontWeight: 700
+            }}
+            aria-label="Toggle menu"
+          >
+            {mobileMenuOpen ? '✕' : '☰'}
+          </button>
         </div>
       </header>
+
+      {/* Mobile Menu Dropdown for Home */}
+      {mobileMenuOpen && (
+        <div 
+          className="hide-desktop"
+          style={{
+            maxWidth: '1150px',
+            width: '92%',
+            margin: '8px auto 0 auto',
+            background: '#ffffff',
+            borderRadius: '24px',
+            padding: '16px 20px',
+            boxShadow: '0 15px 40px rgba(0, 0, 0, 0.6)',
+            position: 'relative',
+            zIndex: 49,
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '12px'
+          }}
+        >
+          {['Product', 'Pricing', 'About'].map((link) => (
+            <a 
+              key={link} 
+              href={`#${link.toLowerCase()}`}
+              onClick={() => setMobileMenuOpen(false)}
+              style={{
+                color: '#111111',
+                fontSize: '0.95rem',
+                fontWeight: 600,
+                textDecoration: 'none',
+                padding: '8px 0',
+                borderBottom: '1px solid #f3f4f6'
+              }}
+            >
+              {link}
+            </a>
+          ))}
+          <Link 
+            to="/designer" 
+            onClick={() => setMobileMenuOpen(false)}
+            style={{
+              background: 'linear-gradient(135deg, #aa3bff, #6b35ff)',
+              color: '#ffffff',
+              borderRadius: '30px',
+              padding: '10px 20px',
+              textAlign: 'center',
+              fontWeight: 700,
+              fontSize: '0.9rem',
+              textDecoration: 'none',
+              marginTop: '4px'
+            }}
+          >
+            🚀 Launch 3D Studio
+          </Link>
+        </div>
+      )}
 
       {/* HERO SECTION - CENTERED DESIGN WITH SCALED COMPOSITED BACKGROUND */}
       <section id="product" style={{
@@ -472,8 +553,8 @@ export default function Home() {
         <div style={{ maxWidth: '1200px', width: '92%', margin: '0 auto' }}>
           <div style={{
             display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
-            gap: '2.5rem',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 180px), 1fr))',
+            gap: '1.5rem',
             textAlign: 'center'
           }}>
             {[
@@ -534,8 +615,8 @@ export default function Home() {
 
         <div style={{
           display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))',
-          gap: '2rem'
+          gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 250px), 1fr))',
+          gap: '1.5rem'
         }}>
           {[
             {
@@ -595,7 +676,7 @@ export default function Home() {
           </div>
 
           {/* Connected Hub Visual */}
-          <div className="reveal reveal-fade-up" style={{
+          <div className="reveal reveal-fade-up connected-hub-container" style={{
             position: 'relative',
             maxWidth: '750px',
             margin: '0 auto',
@@ -615,14 +696,15 @@ export default function Home() {
               justifyContent: 'center',
               zIndex: 5,
               border: '2px solid rgba(255,255,255,0.4)',
-              boxShadow: '0 0 30px rgba(236,72,153,0.4)'
+              boxShadow: '0 0 30px rgba(236,72,153,0.4)',
+              flexShrink: 0
             }}>
               <span style={{ fontSize: '1.8rem' }}>🔥</span>
               <span style={{ fontSize: '0.85rem', fontWeight: 800, letterSpacing: '0.02em', textTransform: 'uppercase' }}>Agni AI</span>
             </div>
 
             {/* Connecting Nodes (Left Column) */}
-            <div style={{
+            <div className="connected-hub-left" style={{
               position: 'absolute',
               left: '10px',
               display: 'flex',
@@ -664,7 +746,7 @@ export default function Home() {
             </div>
 
             {/* Connecting Nodes (Right Column) */}
-            <div style={{
+            <div className="connected-hub-right" style={{
               position: 'absolute',
               right: '10px',
               display: 'flex',
@@ -737,8 +819,8 @@ export default function Home() {
 
         <div style={{
           display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(340px, 1fr))',
-          gap: '2rem'
+          gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 280px), 1fr))',
+          gap: '1.75rem'
         }}>
           {[
             {
@@ -892,7 +974,7 @@ export default function Home() {
           </div>
 
           {/* Double Column: Blueprint View & Compilation logs */}
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(360px, 1fr))' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 300px), 1fr))' }}>
             
             {/* Left: 2D Floor Plan Blueprint or Realistic 3D Render */}
             <div className="sandbox-canvas" style={{ borderRadius: '12px', overflow: 'hidden' }}>
@@ -1725,8 +1807,8 @@ export default function Home() {
 
         <div style={{
           display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
-          gap: '2rem',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 280px), 1fr))',
+          gap: '1.75rem',
           alignItems: 'stretch'
         }}>
           {[
@@ -1882,8 +1964,8 @@ export default function Home() {
 
         <div style={{
           display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))',
-          gap: '3rem',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 280px), 1fr))',
+          gap: '1.75rem',
           maxWidth: '960px',
           margin: '0 auto'
         }}>

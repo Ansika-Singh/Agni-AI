@@ -408,10 +408,10 @@ export default function Wizard({ onComplete }) {
       zIndex: 1000,
       display: 'flex',
       flexDirection: 'column',
-      justifyContent: 'center',
+      justifyContent: 'flex-start',
       alignItems: 'center',
       overflowY: 'auto',
-      padding: '90px 1.5rem 1.5rem 1.5rem',
+      padding: '80px 1rem 2.5rem 1rem',
       fontFamily: 'var(--font-sans)'
     }}>
 
@@ -427,7 +427,7 @@ export default function Wizard({ onComplete }) {
         display: 'flex',
         justifyContent: 'space-between',
         alignItems: 'center',
-        padding: '0 2rem',
+        padding: '0 1.25rem',
         zIndex: 1010
       }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
@@ -505,15 +505,16 @@ export default function Wizard({ onComplete }) {
       <div className="card animate-fade-up" style={{
         maxWidth: '820px',
         width: '100%',
-        padding: '2.5rem',
+        padding: 'clamp(1.25rem, 4vw, 2.5rem)',
         background: 'rgba(16, 17, 30, 0.95)',
         border: '1px solid rgba(255, 255, 255, 0.07)',
-        borderRadius: '24px',
+        borderRadius: '20px',
         boxShadow: '0 20px 50px rgba(0,0,0,0.5)',
-        transition: 'transform 0.3s ease'
+        transition: 'transform 0.3s ease',
+        margin: '0.5rem 0'
       }}>
         {/* Mode Selector Tabs */}
-        <div className="flex gap-2 mb-4 p-1 rounded-full" style={{ background: 'var(--color-surface-2)', border: '1px solid var(--color-border-subtle)', maxWidth: 'fit-content', margin: '0 auto 2.5rem auto' }}>
+        <div className="flex gap-2 mb-4 p-1 rounded-full flex-wrap justify-center" style={{ background: 'var(--color-surface-2)', border: '1px solid var(--color-border-subtle)', maxWidth: '100%', margin: '0 auto 2rem auto' }}>
           <button
             className="btn btn-sm"
             onClick={() => setMode('guided')}
@@ -701,7 +702,7 @@ export default function Wizard({ onComplete }) {
                   </div>
 
                   <div className="grid" style={{
-                    gridTemplateColumns: 'repeat(auto-fit, minmax(190px, 1fr))',
+                    gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 150px), 1fr))',
                     gap: '10px'
                   }}>
                     {roomsLayout.extras.map((opt, i) => renderOptionCard(opt, i, false))}
@@ -767,8 +768,8 @@ export default function Wizard({ onComplete }) {
                 )}
 
                 <div className="grid" style={{
-                  gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
-                  gap: '14px',
+                  gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 150px), 1fr))',
+                  gap: '12px',
                   margin: '1rem 0 2rem 0'
                 }}>
                   {Array.isArray(options) && options.map((opt, i) => (

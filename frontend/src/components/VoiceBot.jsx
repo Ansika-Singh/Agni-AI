@@ -167,7 +167,7 @@ export default function VoiceBot({ currentPlan = 'Starter', onBlockTrigger }) {
     /* Floating Glassmorphic Chat Panel */
     <div className="card flex flex-col animate-fade-in" 
          style={{ 
-           width: '320px', 
+           width: 'min(320px, calc(100vw - 2rem))', 
            height: '380px', 
            minHeight: '380px', 
            background: 'rgba(10, 11, 18, 0.9)', 

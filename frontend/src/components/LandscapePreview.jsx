@@ -676,6 +676,18 @@ export default function LandscapePreview({ floorPlan, preferences, onClose }) {
   const [presetTrigger,  setPresetTrigger]  = useState(0);
   const [showBoundary,   setShowBoundary]   = useState(true);
   const [timeOfDay,      setTimeOfDay]      = useState(14);
+  const [isMobile,       setIsMobile]       = useState(typeof window !== 'undefined' ? window.innerWidth <= 768 : false);
+  const [showLandscapeSidebar, setShowLandscapeSidebar] = useState(typeof window !== 'undefined' ? window.innerWidth > 768 : true);
+
+  useEffect(() => {
+    const handleResize = () => {
+      const mobile = window.innerWidth <= 768;
+      setIsMobile(mobile);
+      if (!mobile) setShowLandscapeSidebar(true);
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   const rooms    = floorPlan?.rooms || [];
   const style    = preferences?.style    || floorPlan?.style    || 'Modern';
@@ -727,43 +739,77 @@ export default function LandscapePreview({ floorPlan, preferences, onClose }) {
         height: '52px', flexShrink: 0, background: 'rgba(8,9,18,0.97)',
         backdropFilter: 'blur(20px)', borderBottom: '1px solid rgba(255,255,255,0.06)',
         display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-        padding: '0 1.25rem', gap: '1rem', zIndex: 10,
+        padding: isMobile ? '0 0.75rem' : '0 1.25rem', gap: '0.5rem', zIndex: 10,
       }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-          <span style={{ fontSize: '1.25rem' }}>✨</span>
-          <div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', minWidth: 0 }}>
+          <span style={{ fontSize: '1.25rem', flexShrink: 0 }}>✨</span>
+          <div style={{ minWidth: 0 }}>
             <div style={{
-              fontWeight: '800', fontSize: '0.9rem',
+              fontWeight: '800', fontSize: isMobile ? '0.8rem' : '0.9rem',
               background: 'linear-gradient(90deg, #4ecdc4, #38bdf8)',
               WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent',
-            }}>Architectural 3D Viewer</div>
-            <div style={{ fontSize: '0.6rem', color: 'rgba(255,255,255,0.4)', marginTop: '1px' }}>
-              {isApartment ? 'Apartment View' : (activeTool ? `🎯 Placing: ${activeTool.label}` : 'Select an item to place it in the yard')}
-            </div>
+              whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
+            }}>Architectural 3D</div>
+            {!isMobile && (
+              <div style={{ fontSize: '0.6rem', color: 'rgba(255,255,255,0.4)', marginTop: '1px', whiteSpace: 'nowrap' }}>
+                {isApartment ? 'Apartment View' : (activeTool ? `🎯 Placing: ${activeTool.label}` : 'Select an item to place it in the yard')}
+              </div>
+            )}
           </div>
         </div>
 
-        <div style={{ display: 'flex', gap: '5px' }}>
+        <div style={{
+          display: 'flex', gap: '4px', overflowX: 'auto',
+          maxWidth: isMobile ? '130px' : 'none', flexShrink: 1,
+          padding: '2px 0', scrollbarWidth: 'none'
+        }}>
           {['isometric', 'aerial', 'front', 'side', 'street'].map(p => (
             <button key={p} onClick={() => applyPreset(p)} style={{
-              padding: '4px 11px', borderRadius: '16px', cursor: 'pointer',
+              padding: isMobile ? '3px 8px' : '4px 11px', borderRadius: '16px', cursor: 'pointer',
               border: cameraPreset === p ? '1px solid #4ecdc4' : '1px solid rgba(255,255,255,0.08)',
               background: cameraPreset === p ? 'rgba(78,205,196,0.14)' : 'rgba(255,255,255,0.03)',
               color: cameraPreset === p ? '#4ecdc4' : 'rgba(255,255,255,0.5)',
-              fontSize: '0.7rem', fontWeight: '700', textTransform: 'capitalize'
+              fontSize: isMobile ? '0.65rem' : '0.7rem', fontWeight: '700', textTransform: 'capitalize',
+              whiteSpace: 'nowrap', flexShrink: 0
             }}>{p}</button>
           ))}
         </div>
 
-        <button onClick={onClose} style={{
-          padding: '6px 18px', borderRadius: '20px',
-          background: 'rgba(236,72,153,0.1)', border: '1px solid rgba(236,72,153,0.35)',
-          color: '#ec4899', fontWeight: '800', fontSize: '0.8rem', cursor: 'pointer',
-        }}>✕ Exit</button>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexShrink: 0 }}>
+          {isMobile && (
+            <button
+              onClick={() => setShowLandscapeSidebar(p => !p)}
+              style={{
+                padding: '5px 9px', borderRadius: '16px',
+                background: showLandscapeSidebar ? 'rgba(78,205,196,0.2)' : 'rgba(255,255,255,0.08)',
+                border: '1px solid rgba(78,205,196,0.4)',
+                color: '#4ecdc4', fontWeight: '700', fontSize: '0.72rem', cursor: 'pointer',
+              }}
+            >
+              {showLandscapeSidebar ? '✕' : '⚙️ Tools'}
+            </button>
+          )}
+
+          <button onClick={onClose} style={{
+            padding: isMobile ? '5px 12px' : '6px 18px', borderRadius: '20px',
+            background: 'rgba(236,72,153,0.1)', border: '1px solid rgba(236,72,153,0.35)',
+            color: '#ec4899', fontWeight: '800', fontSize: isMobile ? '0.75rem' : '0.8rem', cursor: 'pointer',
+          }}>✕ Exit</button>
+        </div>
       </div>
 
       {/* BODY */}
       <div style={{ flex: 1, display: 'flex', overflow: 'hidden', position: 'relative' }}>
+        {/* Mobile Backdrop */}
+        {isMobile && showLandscapeSidebar && (
+          <div
+            onClick={() => setShowLandscapeSidebar(false)}
+            style={{
+              position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.65)',
+              backdropFilter: 'blur(3px)', zIndex: 25
+            }}
+          />
+        )}
         
         {/* CANVAS */}
         <div style={{ flex: 1, position: 'relative', cursor: activeTool ? 'crosshair' : 'grab' }}>
@@ -817,9 +863,32 @@ export default function LandscapePreview({ floorPlan, preferences, onClose }) {
 
         {/* SIDEBAR */}
         <div style={{
-          width: '280px', flexShrink: 0, background: 'rgba(9,10,20,0.97)', backdropFilter: 'blur(20px)',
-          borderLeft: '1px solid rgba(78,205,196,0.1)', display: 'flex', flexDirection: 'column', overflowY: 'auto'
+          position: isMobile ? 'absolute' : 'relative',
+          top: 0, bottom: 0, right: 0,
+          width: isMobile ? 'min(300px, 86vw)' : '280px',
+          transform: isMobile && !showLandscapeSidebar ? 'translateX(100%)' : 'translateX(0)',
+          transition: 'transform 0.25s cubic-bezier(0.16, 1, 0.3, 1)',
+          zIndex: isMobile ? 30 : 5,
+          flexShrink: 0, background: 'rgba(9,10,20,0.98)', backdropFilter: 'blur(20px)',
+          borderLeft: '1px solid rgba(78,205,196,0.15)', display: 'flex', flexDirection: 'column', overflowY: 'auto',
+          boxShadow: isMobile && showLandscapeSidebar ? '-10px 0 30px rgba(0,0,0,0.8)' : 'none'
         }}>
+          {isMobile && (
+            <div style={{
+              display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+              padding: '0.85rem 1rem 0.5rem 1rem', borderBottom: '1px solid rgba(255,255,255,0.06)'
+            }}>
+              <span style={{ fontSize: '0.8rem', fontWeight: '800', color: '#4ecdc4', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Scene & Tools</span>
+              <button
+                onClick={() => setShowLandscapeSidebar(false)}
+                style={{
+                  background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)',
+                  color: 'rgba(255,255,255,0.7)', width: '26px', height: '26px', borderRadius: '50%',
+                  cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.8rem'
+                }}
+              >✕</button>
+            </div>
+          )}
           <div style={{ padding: '1.25rem 1rem', display: 'flex', flexDirection: 'column', gap: '1.25rem', flex: 1 }}>
 
             {/* SCENE CONTROLS */}

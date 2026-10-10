@@ -21,7 +21,7 @@ export default function BudgetPanel({ budgetData }) {
         <span className="text-gold">💰</span> {t('budget.title')}
       </h3>
       
-      <div className="grid gap-3" style={{ gridTemplateColumns: 'repeat(3, 1fr)' }}>
+      <div className="grid gap-2" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(85px, 1fr))' }}>
         <div className="p-3 rounded-md text-center flex flex-col gap-1 border" style={{ background: 'var(--color-surface-2)', borderColor: 'var(--color-border-subtle)' }}>
           <div className="text-xs text-secondary mb-1">{t('budget.construction')}</div>
           <div style={{ height: '3px', background: '#8b5cf6', borderRadius: '2px', width: '90%', margin: '0 auto' }}></div>

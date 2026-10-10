@@ -46,7 +46,11 @@
 /* --- Reset & Base --- */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-html { scroll-behavior: smooth; }
+html { 
+  scroll-behavior: smooth; 
+  overflow-x: hidden;
+  max-width: 100%;
+}
 
 body {
   font-family: var(--font-sans);
@@ -490,15 +494,98 @@ h1, h2, h3, h4, h5 {
   scrollbar-color: var(--color-fire-1) var(--color-surface);
 }
 
-/* --- Responsive --- */
+/* --- Responsive Utilities & Breakpoints --- */
 @media (max-width: 768px) {
   .hide-mobile { display: none !important; }
   .container { padding: 0 1rem; }
-  .btn-lg { padding: 0.875rem 2rem; font-size: 1rem; }
+  .btn-lg { padding: 0.75rem 1.75rem; font-size: 0.95rem; }
+  
+  /* Prevent oversized padding on cards on mobile */
+  .card, 
+  .pricing-card-premium, 
+  .feature-card-premium, 
+  .team-card-premium, 
+  .crisis-card,
+  .tech-col-premium { 
+    padding: 1.5rem 1.25rem !important; 
+  }
+
+  .pricing-card-premium.popular:hover {
+    transform: translateY(-4px) !important;
+  }
+
+  /* Connected Architectural Hub Responsive Layout */
+  .connected-hub-container {
+    height: auto !important;
+    min-height: auto !important;
+    flex-direction: column !important;
+    gap: 1.75rem !important;
+    position: static !important;
+    padding: 1rem 0 !important;
+  }
+
+  .connected-hub-left,
+  .connected-hub-right {
+    position: static !important;
+    width: 100% !important;
+    text-align: center !important;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 12px !important;
+    align-items: center !important;
+    left: auto !important;
+    right: auto !important;
+  }
+
+  .connected-hub-left > div,
+  .connected-hub-right > div {
+    width: 100% !important;
+    max-width: 280px !important;
+    text-align: center !important;
+    padding: 8px 14px !important;
+    font-size: 0.82rem !important;
+  }
+
+  .home-capsule-nav {
+    padding: 8px 16px !important;
+    width: 95% !important;
+    margin: 12px auto 0 auto !important;
+  }
+
+  /* Team Cards */
+  .team-card-premium {
+    padding: 2rem 1.25rem !important;
+  }
+
+  /* Sandbox UI adjustments */
+  .sandbox-card {
+    border-radius: 14px !important;
+  }
+
+  .sandbox-card > div:first-child {
+    padding: 1rem !important;
+  }
+
+  /* Studio responsive sidebar */
+  .studio-mobile-sidebar {
+    width: min(320px, 86vw) !important;
+    box-shadow: 10px 0 40px rgba(0, 0, 0, 0.9) !important;
+  }
 }
 
 @media (min-width: 769px) {
   .hide-desktop { display: none !important; }
+}
+
+@media (max-width: 480px) {
+  .display-xl { font-size: 2.2rem; }
+  .display-lg { font-size: 1.8rem; }
+  .display-md { font-size: 1.4rem; }
+  
+  .btn {
+    padding: 0.65rem 1.25rem;
+    font-size: 0.85rem;
+  }
 }
 
 /* --- New Animations from Standalone HTML --- */

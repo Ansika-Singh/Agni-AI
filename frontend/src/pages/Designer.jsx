@@ -35,6 +35,14 @@ export default function Designer() {
 
   const [activeFloor, setActiveFloor] = useState('all');
   const [toastMessage, setToastMessage] = useState('');
+  const [showMobileSidebar, setShowMobileSidebar] = useState(false);
+  const [isMobile, setIsMobile] = useState(typeof window !== 'undefined' ? window.innerWidth <= 768 : false);
+
+  useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth <= 768);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   // ─── CHAT DRAWER STATES ─────────────────────────────────────────────────────
   const [showChatDrawer, setShowChatDrawer] = useState(false);
@@ -953,7 +961,7 @@ export default function Designer() {
       {floorPlan && availableFloors.length > 1 && (
         <div style={{
           position: 'absolute',
-          bottom: '2.5rem',
+          bottom: isMobile ? '1.5rem' : '2.5rem',
           left: '50%',
           transform: 'translateX(-50%)',
           zIndex: 10,
@@ -962,10 +970,12 @@ export default function Designer() {
           border: '1px solid rgba(236, 72, 153, 0.3)',
           boxShadow: '0 8px 32px rgba(236, 72, 153, 0.15), 0 0 20px rgba(0,0,0,0.6)',
           borderRadius: '16px',
-          padding: '6px',
+          padding: '5px',
           display: 'flex',
-          gap: '8px',
+          gap: '6px',
           alignItems: 'center',
+          maxWidth: 'calc(100vw - 2rem)',
+          overflowX: 'auto',
           fontFamily: 'Outfit, sans-serif'
         }}>
           {availableFloors.map((floorNum) => (
@@ -981,16 +991,17 @@ export default function Designer() {
                   : 'transparent',
                 border: 'none',
                 color: activeFloor === floorNum ? 'white' : 'var(--color-text-secondary)',
-                padding: '8px 16px',
+                padding: isMobile ? '6px 10px' : '8px 16px',
                 borderRadius: '12px',
-                fontSize: '0.8rem',
+                fontSize: isMobile ? '0.72rem' : '0.8rem',
                 fontWeight: '700',
                 cursor: 'pointer',
                 transition: 'all 0.25s cubic-bezier(0.16, 1, 0.3, 1)',
-                boxShadow: activeFloor === floorNum ? '0 2px 10px rgba(255,107,53,0.4)' : 'none'
+                boxShadow: activeFloor === floorNum ? '0 2px 10px rgba(255,107,53,0.4)' : 'none',
+                whiteSpace: 'nowrap'
               }}
             >
-              {floorNum === 0 ? 'Ground Floor (GF)' : `Floor ${floorNum} (L${floorNum})`}
+              {isMobile ? (floorNum === 0 ? 'GF' : `L${floorNum}`) : (floorNum === 0 ? 'Ground Floor (GF)' : `Floor ${floorNum} (L${floorNum})`)}
             </button>
           ))}
           <button
@@ -1001,29 +1012,60 @@ export default function Designer() {
                 : 'transparent',
               border: 'none',
               color: activeFloor === 'all' ? 'white' : 'var(--color-text-secondary)',
-              padding: '8px 16px',
+              padding: isMobile ? '6px 10px' : '8px 16px',
               borderRadius: '12px',
-              fontSize: '0.8rem',
+              fontSize: isMobile ? '0.72rem' : '0.8rem',
               fontWeight: '700',
               cursor: 'pointer',
               transition: 'all 0.25s cubic-bezier(0.16, 1, 0.3, 1)',
-              boxShadow: activeFloor === 'all' ? '0 2px 10px rgba(255,107,53,0.4)' : 'none'
+              boxShadow: activeFloor === 'all' ? '0 2px 10px rgba(255,107,53,0.4)' : 'none',
+              whiteSpace: 'nowrap'
             }}
           >
-            🏢 Stack View (All)
+            {isMobile ? 'Stack' : '🏢 Stack View (All)'}
           </button>
         </div>
+      )}
+
+      {/* Mobile Sidebar Controls Toggle Button */}
+      {isMobile && (
+        <button
+          onClick={() => setShowMobileSidebar(!showMobileSidebar)}
+          style={{
+            position: 'absolute',
+            top: '1rem',
+            left: '1rem',
+            zIndex: 30,
+            display: 'flex',
+            alignItems: 'center',
+            gap: '6px',
+            background: 'rgba(10, 11, 18, 0.9)',
+            backdropFilter: 'blur(15px)',
+            border: '1px solid rgba(236, 72, 153, 0.45)',
+            color: 'white',
+            borderRadius: '12px',
+            padding: '7px 12px',
+            fontSize: '0.75rem',
+            fontWeight: '700',
+            boxShadow: '0 4px 15px rgba(0,0,0,0.6)',
+            cursor: 'pointer'
+          }}
+          aria-label="Toggle studio tools"
+        >
+          {showMobileSidebar ? '✕ Close' : '☰ Controls'}
+        </button>
       )}
 
       {/* Floating Canvas Top-Left Title Pill */}
       <div style={{
              position: 'absolute',
-             top: '1rem',
-             left: 'calc(320px + 2rem)',
+             top: isMobile ? '3.5rem' : '1rem',
+             left: isMobile ? '1rem' : 'calc(320px + 2rem)',
+             maxWidth: isMobile ? 'calc(100vw - 2rem)' : 'none',
              zIndex: 10,
-             padding: '0.75rem 1rem',
+             padding: '0.65rem 0.9rem',
              borderRadius: '12px',
-             background: 'rgba(10, 11, 18, 0.8)',
+             background: 'rgba(10, 11, 18, 0.85)',
              backdropFilter: 'blur(15px)',
              border: blueprintMode ? '1px solid rgba(78,205,196,0.45)' : '1px solid rgba(236, 72, 153, 0.25)',
              boxShadow: '0 4px 20px rgba(0,0,0,0.6)',
@@ -1032,7 +1074,7 @@ export default function Designer() {
              flexDirection: 'column',
              gap: '2px'
            }}>
-        <h2 className="text-white" style={{ fontSize: '0.875rem', fontWeight: '800', letterSpacing: '0.5px' }}>
+        <h2 className="text-white" style={{ fontSize: '0.85rem', fontWeight: '800', letterSpacing: '0.5px' }}>
           {blueprintMode ? '📐 ' : ''}{floorPlan.title || '2BHK — Traditional Indian'}
         </h2>
         <span className="text-secondary" style={{ fontSize: '10px', fontWeight: '600', textTransform: 'uppercase' }}>
@@ -1041,28 +1083,30 @@ export default function Designer() {
       </div>
 
       {/* Floating Canvas Top-Right Instruction Tag */}
-      <div className="text-secondary"
-           style={{
-             position: 'absolute',
-             top: '1.5rem',
-             zIndex: 10,
-             fontSize: '11px',
-             fontWeight: '600',
-             letterSpacing: '0.05em',
-             pointerEvents: 'none',
-             right: showInspector ? 'calc(340px + 2.5rem)' : '2rem',
-             textShadow: '0 2px 4px rgba(0,0,0,0.9)',
-             fontFamily: 'Plus Jakarta Sans, sans-serif',
-             transition: 'right 0.3s ease'
-           }}>
-        {blueprintMode ? '📐 Blueprint Mode Active — Professional CAD View' : '🖱 Left drag · orbit  ·  Right drag · pan  ·  Scroll · zoom'}
-      </div>
+      {!isMobile && (
+        <div className="text-secondary"
+             style={{
+               position: 'absolute',
+               top: '1.5rem',
+               zIndex: 10,
+               fontSize: '11px',
+               fontWeight: '600',
+               letterSpacing: '0.05em',
+               pointerEvents: 'none',
+               right: showInspector ? 'calc(340px + 2.5rem)' : '2rem',
+               textShadow: '0 2px 4px rgba(0,0,0,0.9)',
+               fontFamily: 'Plus Jakarta Sans, sans-serif',
+               transition: 'right 0.3s ease'
+             }}>
+          {blueprintMode ? '📐 Blueprint Mode Active — Professional CAD View' : '🖱 Left drag · orbit  ·  Right drag · pan  ·  Scroll · zoom'}
+        </div>
+      )}
 
       {/* 3D Camera Controls Legend — bottom-center */}
       {viewMode === '3D' && !blueprintMode && (
         <div style={{
           position: 'absolute',
-          bottom: '4.5rem',
+          bottom: isMobile ? '4.2rem' : '4.5rem',
           left: '50%',
           transform: 'translateX(-50%)',
           zIndex: 10,
@@ -1074,7 +1118,9 @@ export default function Designer() {
           backdropFilter: 'blur(10px)',
           border: '1px solid rgba(255,255,255,0.07)',
           borderRadius: '24px',
-          padding: '6px 14px',
+          padding: isMobile ? '4px 10px' : '6px 14px',
+          maxWidth: 'calc(100vw - 2rem)',
+          overflowX: 'auto'
         }}>
           {[
             { icon: '🖱', label: 'Drag', sub: 'Orbit 360°' },
@@ -1085,10 +1131,10 @@ export default function Designer() {
               display: 'flex',
               alignItems: 'center',
               gap: '5px',
-              padding: '0 8px',
+              padding: '0 6px',
               borderRight: i < 2 ? '1px solid rgba(255,255,255,0.08)' : 'none',
             }}>
-              <span style={{ fontSize: '13px', opacity: 0.9 }}>{c.icon}</span>
+              <span style={{ fontSize: '12px', opacity: 0.9 }}>{c.icon}</span>
               <div style={{ display: 'flex', flexDirection: 'column', lineHeight: 1.2 }}>
                 <span style={{ fontSize: '9px', fontWeight: '700', color: 'rgba(255,255,255,0.9)', letterSpacing: '0.3px' }}>{c.sub}</span>
                 <span style={{ fontSize: '8px', color: 'rgba(255,255,255,0.4)' }}>{c.label}</span>
@@ -1099,7 +1145,7 @@ export default function Designer() {
       )}
 
 
-          {/* Floating Collapsible Right Inspector Toggle Button */}
+      {/* Floating Collapsible Right Inspector Toggle Button */}
       {!showInspector && (
         <button 
           onClick={openInspector}
@@ -1107,24 +1153,24 @@ export default function Designer() {
           style={{
             position: 'absolute',
             top: '1rem',
-            right: '2rem',
+            right: isMobile ? '1rem' : '2rem',
             zIndex: 10,
             display: 'flex',
             alignItems: 'center',
             gap: '6px',
-            background: 'rgba(10, 11, 18, 0.8)',
+            background: 'rgba(10, 11, 18, 0.85)',
             backdropFilter: 'blur(15px)',
             border: '1px solid rgba(236, 72, 153, 0.25)',
             color: 'white',
             borderRadius: '12px',
-            padding: '8px 16px',
-            fontSize: '0.75rem',
+            padding: isMobile ? '6px 12px' : '8px 16px',
+            fontSize: isMobile ? '0.72rem' : '0.75rem',
             fontWeight: '700',
             boxShadow: '0 4px 15px rgba(0,0,0,0.5)',
             cursor: 'pointer'
           }}
         >
-          ⚙️ Open Inspector
+          ⚙️ Inspector
         </button>
       )}
 
@@ -1135,46 +1181,62 @@ export default function Designer() {
           className="btn"
           style={{
             position: 'absolute',
-            top: showInspector ? '1rem' : '4rem',
-            right: showInspector ? 'calc(340px + 2rem)' : '2rem',
+            top: showInspector ? '1rem' : (isMobile ? '3.2rem' : '4rem'),
+            right: showInspector ? (isMobile ? '1rem' : 'calc(340px + 2rem)') : (isMobile ? '1rem' : '2rem'),
             zIndex: 10,
             display: 'flex',
             alignItems: 'center',
             gap: '6px',
-            background: 'rgba(10, 11, 18, 0.8)',
+            background: 'rgba(10, 11, 18, 0.85)',
             backdropFilter: 'blur(15px)',
             border: '1px solid rgba(0, 212, 170, 0.3)',
             color: 'white',
             borderRadius: '12px',
-            padding: '8px 16px',
-            fontSize: '0.75rem',
+            padding: isMobile ? '6px 12px' : '8px 16px',
+            fontSize: isMobile ? '0.72rem' : '0.75rem',
             fontWeight: '700',
             boxShadow: '0 4px 15px rgba(0,0,0,0.5)',
             cursor: 'pointer',
             transition: 'all 0.3s cubic-bezier(0.16, 1, 0.3, 1)'
           }}
         >
-          💬 Ask Agni AI
+          💬 Ask Agni
         </button>
       )}
 
+      {/* Mobile Sidebar Backdrop */}
+      {isMobile && showMobileSidebar && (
+        <div 
+          onClick={() => setShowMobileSidebar(false)}
+          style={{
+            position: 'absolute',
+            inset: 0,
+            zIndex: 24,
+            background: 'rgba(0,0,0,0.5)',
+            backdropFilter: 'blur(3px)'
+          }}
+        />
+      )}
+
       {/* FLOATING LEFT SIDEBAR OVERLAY */}
-      <div style={{
+      <div className={isMobile ? "studio-mobile-sidebar" : ""}
+           style={{
              position: 'absolute',
-             left: 0,
+             left: isMobile ? (showMobileSidebar ? 0 : '-340px') : 0,
              top: 0,
              bottom: 0,
-             width: '320px',
-             zIndex: 10,
+             width: isMobile ? 'min(320px, 86vw)' : '320px',
+             zIndex: 25,
              display: 'flex',
              flexDirection: 'column',
              justifyContent: 'space-between',
-             background: 'rgba(10, 11, 18, 0.85)',
+             background: 'rgba(10, 11, 18, 0.95)',
              backdropFilter: 'blur(25px)',
              borderRight: '1px solid rgba(236, 72, 153, 0.2)',
              boxShadow: '3px 0 25px rgba(236, 72, 153, 0.15), 0 0 35px rgba(0,0,0,0.85)',
-             padding: '1.5rem 1.25rem 1.25rem',
-             overflow: 'hidden'
+             padding: '1.25rem 1rem 1rem',
+             overflow: 'hidden',
+             transition: 'left 0.3s cubic-bezier(0.16, 1, 0.3, 1)'
            }}>
         
         {/* Glow Line Accent on Right Border */}
@@ -1198,22 +1260,40 @@ export default function Designer() {
                 <span style={{ fontSize: '1.4rem', animation: 'flame 1.5s ease infinite' }}>🔥</span>
                 <span className="font-display font-extrabold text-white text-md tracking-wider">Agni AI</span>
               </div>
-              <button 
-                onClick={() => setFloorPlan(null)}
-                className="btn btn-ghost btn-sm"
-                style={{
-                  borderRadius: '8px',
-                  padding: '4px 10px',
-                  fontSize: '0.7rem',
-                  fontWeight: '700',
-                  border: '1px solid rgba(236, 72, 153, 0.3)',
-                  color: '#ec4899',
-                  background: 'rgba(236, 72, 153, 0.05)',
-                  cursor: 'pointer'
-                }}
-              >
-                + New
-              </button>
+              <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
+                <button 
+                  onClick={() => setFloorPlan(null)}
+                  className="btn btn-ghost btn-sm"
+                  style={{
+                    borderRadius: '8px',
+                    padding: '4px 10px',
+                    fontSize: '0.7rem',
+                    fontWeight: '700',
+                    border: '1px solid rgba(236, 72, 153, 0.3)',
+                    color: '#ec4899',
+                    background: 'rgba(236, 72, 153, 0.05)',
+                    cursor: 'pointer'
+                  }}
+                >
+                  + New
+                </button>
+                {isMobile && (
+                  <button
+                    onClick={() => setShowMobileSidebar(false)}
+                    style={{
+                      background: 'rgba(255,255,255,0.08)',
+                      border: '1px solid rgba(255,255,255,0.15)',
+                      borderRadius: '8px',
+                      color: 'white',
+                      padding: '4px 8px',
+                      fontSize: '0.75rem',
+                      cursor: 'pointer'
+                    }}
+                  >
+                    ✕
+                  </button>
+                )}
+              </div>
             </div>
             {/* Dynamic Active Plan Pill & Switcher */}
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'rgba(255,255,255,0.03)', padding: '6px 10px', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.05)' }}>
@@ -1996,12 +2076,12 @@ export default function Designer() {
              flexDirection: 'column',
              gap: '2rem',
              right: showInspector ? '0' : '-360px',
-             width: '340px',
-             background: 'rgba(10, 11, 18, 0.85)',
+             width: isMobile ? 'min(340px, 100vw)' : '340px',
+             background: 'rgba(10, 11, 18, 0.95)',
              backdropFilter: 'blur(25px)',
              borderLeft: '1px solid rgba(236, 72, 153, 0.2)',
              boxShadow: '-3px 0 25px rgba(236, 72, 153, 0.15), 0 0 35px rgba(0,0,0,0.85)',
-             padding: '1.5rem 1.25rem',
+             padding: isMobile ? '1.25rem 1rem' : '1.5rem 1.25rem',
              transition: 'right 0.3s cubic-bezier(0.16, 1, 0.3, 1)',
              overflowY: 'auto'
            }}>
@@ -2174,16 +2254,16 @@ export default function Designer() {
              position: 'absolute',
              top: 0,
              bottom: 0,
-             zIndex: 20,
+             zIndex: isMobile ? 35 : 20,
              display: 'flex',
              flexDirection: 'column',
-             right: showChatDrawer ? (showInspector ? '340px' : '0') : '-360px',
-             width: '340px',
-             background: 'rgba(10, 11, 18, 0.92)',
+             right: showChatDrawer ? (isMobile ? '0' : (showInspector ? '340px' : '0')) : '-360px',
+             width: isMobile ? 'min(340px, 100vw)' : '340px',
+             background: 'rgba(10, 11, 18, 0.95)',
              backdropFilter: 'blur(25px)',
              borderLeft: '1px solid rgba(0, 212, 170, 0.3)',
              boxShadow: '-3px 0 25px rgba(0, 212, 170, 0.15), 0 0 35px rgba(0,0,0,0.85)',
-             padding: '1.5rem 1.25rem',
+             padding: isMobile ? '1.25rem 1rem' : '1.5rem 1.25rem',
              transition: 'right 0.3s cubic-bezier(0.16, 1, 0.3, 1)',
              overflow: 'hidden',
              pointerEvents: showChatDrawer ? 'all' : 'none'
@@ -2871,7 +2951,7 @@ export default function Designer() {
       )}
 
       {/* Floating Chat Trigger Launcher */}
-      <div style={{ position: 'absolute', right: '2rem', bottom: '2rem', zIndex: 10 }}>
+      <div style={{ position: 'absolute', right: isMobile ? '1rem' : '2rem', bottom: isMobile ? '1rem' : '2rem', zIndex: 10 }}>
         <VoiceBot currentPlan={currentPlan} onBlockTrigger={() => checkPlanAndTrigger('voice', 'Enterprise', () => {})} />
       </div>
 
